@@ -11,6 +11,7 @@ namespace ViandasDelSur.Models
         public byte[] hash { get; set; }
         public string firstName { get; set; }
         public string lastName { get; set; }
+        public string phone { get; set; }
 
         public ICollection<Location> Locations { get; set; }
         public ICollection<Order> Orders { get; set; }
