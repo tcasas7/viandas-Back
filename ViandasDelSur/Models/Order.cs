@@ -13,5 +13,7 @@ namespace ViandasDelSur.Models
 
         public int userId { get; set; }
         public User User { get; set; }
+
+        public ICollection<Delivery> Deliveries { get; set; }
     }
 }

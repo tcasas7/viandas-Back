@@ -9,5 +9,7 @@ namespace ViandasDelSur.Models
         public DbSet<Location> Locations { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Order> Orders { get; set; }
+        public DbSet<Delivery> Delivery { get; set; }
+        public DbSet<Product> Products { get; set; }
     }
 }
