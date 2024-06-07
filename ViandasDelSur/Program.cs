@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using System;
 using ViandasDelSur.Models;
 using ViandasDelSur.Repositories.Implementations;
 using ViandasDelSur.Repositories.Interfaces;
@@ -64,6 +63,7 @@ builder.Services.AddScoped<ILocationRepository, LocationRepository>();
 //Adds services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IVerificationService, VerificationService>();
+builder.Services.AddScoped<IUsersService, UsersService>();
 
 var app = builder.Build();
 
