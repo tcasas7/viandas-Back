@@ -11,7 +11,6 @@ namespace ViandasDelSur.Models.DTOS
         public string firstName { get; set; }
         public string lastName { get; set; }
         public List<LocationDTO> locations { get; set; } = new List<LocationDTO>();
-        //agregar orders
 
         public UserDTO() { }
 
@@ -29,7 +28,6 @@ namespace ViandasDelSur.Models.DTOS
                 LocationDTO locationDTO = new LocationDTO(location);
                 locations.Add(locationDTO);
             }
-            //agregar orders
         }
     }
 }

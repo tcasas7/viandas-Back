@@ -59,6 +59,8 @@ builder.Services.AddDbContext<VDSContext>(options =>
 //Adds repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ILocationRepository, LocationRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IDeliveryRepository, DeliveryRepository>();
 
 //Adds services
 builder.Services.AddScoped<IAuthService, AuthService>();
