@@ -7,6 +7,7 @@ namespace ViandasDelSur.Models.DTOS
         public int Id { get; set; }
         public Role role { get; set; }
         public string email { get; set; }
+        public string phone { get; set; }
         public string firstName { get; set; }
         public string lastName { get; set; }
         public List<LocationDTO> locations { get; set; } = new List<LocationDTO>();
@@ -18,6 +19,7 @@ namespace ViandasDelSur.Models.DTOS
         {
             Id = user.Id;
             role = user.role;
+            phone = user.phone;
             email = user.email;
             firstName = user.firstName;
             lastName = user.lastName;
