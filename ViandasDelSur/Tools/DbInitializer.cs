@@ -14,7 +14,7 @@ namespace ViandasDelSur.Tools
             {
                 Image image = new Image();
                 image.route = "Default.png";
-                image.name = "UserPlaceHolder";
+                image.name = "Default";
 
                 context.Images.Add(image);
                 context.SaveChanges();

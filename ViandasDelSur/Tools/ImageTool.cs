@@ -45,9 +45,9 @@ namespace ViandasDelSur.Tools
             return newImage;
         }
 
-        public bool DeleteImage(string imagePath)
+        public bool DeleteImage(string imagePath, string imageName)
         {
-            if (System.IO.File.Exists(imagePath))
+            if (System.IO.File.Exists(imagePath) && imageName.ToUpper() != "DEFAULT".ToUpper())
             {
                 System.IO.File.Delete(imagePath);
                 return true;
