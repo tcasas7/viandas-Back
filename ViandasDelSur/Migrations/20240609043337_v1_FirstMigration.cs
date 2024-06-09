@@ -12,6 +12,20 @@ namespace ViandasDelSur.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Images",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    route = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Images", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Menu",
                 columns: table => new
                 {
@@ -36,7 +50,8 @@ namespace ViandasDelSur.Migrations
                     salt = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     hash = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     firstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    lastName = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    lastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    phone = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -51,11 +66,17 @@ namespace ViandasDelSur.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     day = table.Column<int>(type: "int", nullable: false),
-                    menuId = table.Column<int>(type: "int", nullable: false)
+                    menuId = table.Column<int>(type: "int", nullable: false),
+                    ImageId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Products", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Products_Images_ImageId",
+                        column: x => x.ImageId,
+                        principalTable: "Images",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Products_Menu_menuId",
                         column: x => x.menuId,
@@ -157,6 +178,11 @@ namespace ViandasDelSur.Migrations
                 column: "userId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Products_ImageId",
+                table: "Products",
+                column: "ImageId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Products_menuId",
                 table: "Products",
                 column: "menuId");
@@ -179,6 +205,9 @@ namespace ViandasDelSur.Migrations
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Images");
 
             migrationBuilder.DropTable(
                 name: "Menu");

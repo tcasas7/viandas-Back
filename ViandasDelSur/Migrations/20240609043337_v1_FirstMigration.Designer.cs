@@ -12,8 +12,8 @@ using ViandasDelSur.Models;
 namespace ViandasDelSur.Migrations
 {
     [DbContext(typeof(VDSContext))]
-    [Migration("20240609014137_v3_ChangeDayInProductForDayOfWeek")]
-    partial class v3_ChangeDayInProductForDayOfWeek
+    [Migration("20240609043337_v1_FirstMigration")]
+    partial class v1_FirstMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -52,6 +52,25 @@ namespace ViandasDelSur.Migrations
                     b.HasIndex("productId");
 
                     b.ToTable("Delivery");
+                });
+
+            modelBuilder.Entity("ViandasDelSur.Models.Image", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("route")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Images");
                 });
 
             modelBuilder.Entity("ViandasDelSur.Models.Location", b =>
@@ -135,6 +154,9 @@ namespace ViandasDelSur.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<long?>("ImageId")
+                        .HasColumnType("bigint");
+
                     b.Property<int>("day")
                         .HasColumnType("int");
 
@@ -145,6 +167,8 @@ namespace ViandasDelSur.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ImageId");
 
                     b.HasIndex("menuId");
 
@@ -228,13 +252,24 @@ namespace ViandasDelSur.Migrations
 
             modelBuilder.Entity("ViandasDelSur.Models.Product", b =>
                 {
+                    b.HasOne("ViandasDelSur.Models.Image", "Image")
+                        .WithMany("Products")
+                        .HasForeignKey("ImageId");
+
                     b.HasOne("ViandasDelSur.Models.Menu", "Menu")
                         .WithMany("Products")
                         .HasForeignKey("menuId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Image");
+
                     b.Navigation("Menu");
+                });
+
+            modelBuilder.Entity("ViandasDelSur.Models.Image", b =>
+                {
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("ViandasDelSur.Models.Menu", b =>

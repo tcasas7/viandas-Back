@@ -51,6 +51,25 @@ namespace ViandasDelSur.Migrations
                     b.ToTable("Delivery");
                 });
 
+            modelBuilder.Entity("ViandasDelSur.Models.Image", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("route")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Images");
+                });
+
             modelBuilder.Entity("ViandasDelSur.Models.Location", b =>
                 {
                     b.Property<int>("Id")
@@ -132,6 +151,9 @@ namespace ViandasDelSur.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<long?>("ImageId")
+                        .HasColumnType("bigint");
+
                     b.Property<int>("day")
                         .HasColumnType("int");
 
@@ -142,6 +164,8 @@ namespace ViandasDelSur.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ImageId");
 
                     b.HasIndex("menuId");
 
@@ -225,13 +249,24 @@ namespace ViandasDelSur.Migrations
 
             modelBuilder.Entity("ViandasDelSur.Models.Product", b =>
                 {
+                    b.HasOne("ViandasDelSur.Models.Image", "Image")
+                        .WithMany("Products")
+                        .HasForeignKey("ImageId");
+
                     b.HasOne("ViandasDelSur.Models.Menu", "Menu")
                         .WithMany("Products")
                         .HasForeignKey("menuId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Image");
+
                     b.Navigation("Menu");
+                });
+
+            modelBuilder.Entity("ViandasDelSur.Models.Image", b =>
+                {
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("ViandasDelSur.Models.Menu", b =>

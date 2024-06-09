@@ -7,5 +7,6 @@ namespace ViandasDelSur.Services.Interfaces
     {
         Response Get();
         Response Add(string email, AddMenusDTO model);
+        Response ChangeImage(IFormFile model, int productId);
     }
 }

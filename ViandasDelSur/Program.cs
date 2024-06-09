@@ -1,12 +1,14 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Text;
 using ViandasDelSur.Models;
 using ViandasDelSur.Repositories.Implementations;
 using ViandasDelSur.Repositories.Interfaces;
 using ViandasDelSur.Services.Implementations;
 using ViandasDelSur.Services.Interfaces;
+using ViandasDelSur.Tools;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,6 +64,8 @@ builder.Services.AddScoped<ILocationRepository, LocationRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IDeliveryRepository, DeliveryRepository>();
 builder.Services.AddScoped<IMenuRepository, MenuRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IImageRepository, ImageRepository>();
 
 //Adds services
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -71,6 +75,24 @@ builder.Services.AddScoped<IOrdersService, OrdersService>();
 builder.Services.AddScoped<IMenusService, MenusService>();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+
+    //Aqui obtenemos todos los services registrados en la App
+    var services = scope.ServiceProvider;
+    try
+    {
+        // En este paso buscamos un service que este con la clase
+        var context = services.GetRequiredService<VDSContext>();
+        DbInitializer.Initialize(context);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Ha ocurrido un error al enviar la información a la base de datos!");
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

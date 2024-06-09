@@ -5,6 +5,7 @@ using ViandasDelSur.Models.DTOS;
 using ViandasDelSur.Models.Responses;
 using ViandasDelSur.Repositories.Interfaces;
 using ViandasDelSur.Services.Interfaces;
+using ViandasDelSur.Tools;
 
 namespace ViandasDelSur.Services.Implementations
 {
@@ -13,15 +14,23 @@ namespace ViandasDelSur.Services.Implementations
         private readonly IMenuRepository _menuRepository;
         private readonly IUserRepository _userRepository;
         private readonly IVerificationService _verificationService;
-
+        private readonly ImageTool _imageTool;
+        private readonly IProductRepository _productRepository;
+        private readonly IImageRepository _imageRepository;
         public MenusService(
             IMenuRepository menuRepository,
             IUserRepository userRepository,
-            IVerificationService verificationService)
+            IVerificationService verificationService,
+            IProductRepository productRepository,
+            IImageRepository imageRepository)
         {
             _menuRepository = menuRepository;
             _userRepository = userRepository;
             _verificationService = verificationService;
+            _imageTool = new ImageTool();
+            _productRepository = productRepository;
+            _imageRepository = imageRepository;
+
         }
 
         public Response Get()
@@ -77,9 +86,19 @@ namespace ViandasDelSur.Services.Implementations
                 return response;
             }
 
+            Image placeHolder = _imageRepository.GetByName("Default");
+
+            if (placeHolder == null)
+            {
+                response.statusCode = 400;
+                response.message = "Error";
+                return response;
+            }
+
             foreach (var menuDTO in model.Menus)
             {
-                Menu menu = new Menu(menuDTO);
+                Menu menu = new Menu(menuDTO, placeHolder);
+                menu.validDate = DatesTool.GetNextDay(DayOfWeek.Monday);
                 _menuRepository.Save(menu);
             }
 
@@ -90,6 +109,61 @@ namespace ViandasDelSur.Services.Implementations
 
             response.statusCode = 200;
             response.message = "Ok";
+
+            return response;
+        }
+
+        public Response ChangeImage(IFormFile model, int productId)
+        {
+            Response response = new Response();
+
+            // Verifica que el archivo no sea nulo
+            if (model == null || model.Length == 0)
+            {
+                response.statusCode = 400;
+                response.message = "Invalid image file.";
+                return response;
+            }
+
+            var prod = _productRepository.GetById(productId);
+
+            if (prod == null)
+            {
+                response.statusCode = 404;
+                response.message = "Producto no encontrado";
+                return response;
+            }
+
+            // Obtiene la imagen actual del usuario
+            Image dbImage = _imageRepository.GetById(productId);
+
+            try
+            {
+                // Crea una nueva imagen
+                Image newImage = _imageTool.CreateImage(model);
+
+                // Guarda la nueva imagen en el repositorio
+                _imageRepository.Save(newImage);
+
+                // Actualiza la referencia de la imagen en el usuario
+                prod.Image = newImage;
+                _productRepository.Save(prod);
+
+                // Si hay una imagen anterior, elimínala
+                if (dbImage != null)
+                {
+                    _imageTool.DeleteImage(dbImage.route);
+                    _imageRepository.Remove(dbImage);
+                }
+
+                response.statusCode = 200;
+                response.message = "Profile image updated successfully.";
+            }
+            catch (Exception ex)
+            {
+                response.statusCode = 500;
+                response.message = ex.Message;
+            }
 
             return response;
         }

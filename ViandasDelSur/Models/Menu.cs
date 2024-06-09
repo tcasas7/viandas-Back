@@ -12,7 +12,7 @@ namespace ViandasDelSur.Models
 
         public Menu(){}
 
-        public Menu(MenuDTO menuDTO)
+        public Menu(MenuDTO menuDTO, Image image)
         {
             Id = menuDTO.Id;
             category = menuDTO.category;
@@ -21,6 +21,7 @@ namespace ViandasDelSur.Models
             foreach (var productDTO in menuDTO.products)
             {
                 Product product = new Product(productDTO);
+                product.Image = image;
                 Products.Add(product);
             }
         }

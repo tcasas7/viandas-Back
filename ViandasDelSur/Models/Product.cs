@@ -1,5 +1,4 @@
 ﻿using ViandasDelSur.Models.DTOS;
-using ViandasDelSur.Models.Enums;
 
 namespace ViandasDelSur.Models
 {
@@ -13,6 +12,8 @@ namespace ViandasDelSur.Models
 
         public int menuId { get; set; }
         public Menu Menu { get; set; }
+
+        public Image Image { get; set; }
 
         public Product() { }
 
