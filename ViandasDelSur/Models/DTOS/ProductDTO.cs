@@ -1,0 +1,16 @@
+﻿namespace ViandasDelSur.Models.DTOS
+{
+    public class ProductDTO
+    {
+        public int Id { get; set; }
+        public DayOfWeek day { get; set; }
+        public string name { get; set; }
+
+        public ProductDTO(Product product) 
+        {
+            Id = product.Id;
+            day = product.day;
+            name = product.name;
+        }
+    }
+}

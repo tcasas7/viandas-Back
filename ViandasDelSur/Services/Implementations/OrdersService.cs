@@ -3,6 +3,7 @@ using ViandasDelSur.Models.DTOS;
 using ViandasDelSur.Models.Responses;
 using ViandasDelSur.Repositories.Interfaces;
 using ViandasDelSur.Services.Interfaces;
+using ViandasDelSur.Tools;
 
 namespace ViandasDelSur.Services.Implementations
 {
@@ -133,7 +134,7 @@ namespace ViandasDelSur.Services.Implementations
                 Delivery delivery = new Delivery();
                 delivery.productId = deliveryDTO.productId;
                 delivery.delivered = false;
-                delivery.deliveryDate = deliveryDTO.deliveryDate;
+                delivery.deliveryDate = DatesTool.GetNextDay(deliveryDTO.deliveryDate);
                 order.Deliveries.Add(delivery);
             }
 

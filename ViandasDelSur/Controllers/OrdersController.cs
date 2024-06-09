@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Any;
-using ViandasDelSur.Models;
 using ViandasDelSur.Models.DTOS;
 using ViandasDelSur.Models.Responses;
-using ViandasDelSur.Repositories.Interfaces;
 using ViandasDelSur.Services.Interfaces;
 
 namespace ViandasDelSur.Controllers
