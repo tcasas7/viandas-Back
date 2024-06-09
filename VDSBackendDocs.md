@@ -18,22 +18,21 @@ route: **string**
 
 Products: **ICollection[Product]**
 
-
-###Location
+### Location
 Id: **number**
 dir: **string**
 
 userId: **number**
 User: **User**
 
-###Menu
+### Menu
 Id: **number**
 category: **string**
 validDate: **DateTime**
 
 Products: **ICollection[Product]**
 
-###Order
+### Order
 Id: **number**
 price: **double**
 paymentMethod: **PaymentMethod**
@@ -46,7 +45,7 @@ User: **User**
 
 Deliveries: **ICollecion[Delivery]**
 
-###Product
+### Product
 Id: **number**
 name: **string**
 day: **DayOfWeek**
@@ -58,7 +57,7 @@ Menu: **Menu**
 
 Image: **Image**
 
-###User
+### User
 Id: **number**
 email: **string**
 role: **Role**
@@ -73,69 +72,69 @@ Locations: **ICollection[Location]**
 Orders: **ICollection[Order]**
 
 
-##Enums
-###Day
+## Enums
+### Day
 0: **MONDAY**
 1: **TUESTDAY**
 2: **WEDNESDAY**
 3: **THURSDAY**
 4: **FRIDAY**
 
-###PaymentMethod
+### PaymentMethod
 0: **EFECTIVO**
 1: **TRANSFERENCIA**
 
-###Role
+### Role
 0: **CLIENT**
 1: **DELIVERY**
 2: **ADMIN**
 
-##Response Models
-###Response
+## Response Models
+### Response
 statusCode: **number**
 message: **string**
 
-###ResponseModel[T]
+### ResponseModel[T]
 Inherits: **Response**
 model: **T**
 
-###ResponseCollection[T]
+### ResponseCollection[T]
 Inherits: **Response**
 model: **T**
 
-##DTOS
-###AddMenusDTO
+## DTOS
+### AddMenusDTO
 Menus: **List[MenuDTO]**
 
-###ChangePasswordDTO
+### ChangePasswordDTO
 email: **string**
 phone: **string**
 password: **string**
 
-###ChangeRoleDTO
+### ChangeRoleDTO
 email: **string**
 Role: **string**
 
-###DeliveryDTO
+### DeliveryDTO
 Id: **number**
 productId: **number**
 delivered: **boolean**
 deliveryDate: **DayOfWeek**
 
-###LocationDTO
+### LocationDTO
 Id: **number**
 dir: **string**
 
-###LoginDTO
+### LoginDTO
 email: **string**
 password: **string**
 
-###MenuDTO
+### MenuDTO
 Id: **number**
 category: **string**
 validDate: **DateTime**
 
-###OrderDTO
+### OrderDTO
 Id: **number**
 price: **double**
 paymentMethod: **PaymentMethod**
@@ -145,19 +144,19 @@ orderDate: **DateTime**
 
 deliveries: **List[DeliveryDTO]**
 
-###ProductDTO
+### ProductDTO
 Id: **number**
 day: **DayOfWeek**
 name: **string**
 
-###RegisterDTO
+### RegisterDTO
 email: **string**
 password: **string**
 firstName: **string**
 lastName: **string**
 phone: **string**
 
-###UserDTO
+### UserDTO
 Id: **number**
 role: **Role**
 email: **string**
@@ -166,9 +165,9 @@ firstName: **string**
 lastName: **string**
 locations: **List[LocationDTO]**
 
-##Controllers
+## Controllers
 
-###AuthController
+### AuthController
 Type: **POST**
 Endpoint: **/api/Auth/login**
 Body: **LoginDTO**
@@ -190,7 +189,7 @@ Header: **Authorization**
 Response: **ResponseModel[string]**
 Description: **Renews the old JWT.**
 
-###MenusController
+### MenusController
 Type: **GET**
 Endpoint: **/api/Menus**
 Body: **null**
@@ -219,7 +218,7 @@ Header: **Authorize**
 Response: **Response**
 Description: **Replaces the given productId Image on the DB for the new one.**
 
-##OrdersController
+## OrdersController
 Type: **POST**
 Endpoint: **/api/Orders**
 Body: **email: string**
@@ -248,7 +247,7 @@ Header: **Authorize**
 Response: **Response**
 Description: **Deletes the order of the given orderId.**
 
-##UsersController
+## UsersController
 Type: **GET**
 Endpoint: **/api/Users**
 Body: **null**
