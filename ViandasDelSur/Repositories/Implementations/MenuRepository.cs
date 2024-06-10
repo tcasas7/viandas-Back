@@ -12,13 +12,17 @@ namespace ViandasDelSur.Repositories.Implementations
 
         public ICollection<Menu> GetAll()
         {
-            return FindAll().ToList();
+            return FindAll()
+                .Include(m => m.Products)
+                .ThenInclude(p => p.Image)
+                .ToList();
         }
 
         public Menu GetById(int id)
         {
             return FindByCondition(m => m.Id == id)
                 .Include(m => m.Products)
+                .ThenInclude(p => p.Image)
                 .FirstOrDefault();
         }
 

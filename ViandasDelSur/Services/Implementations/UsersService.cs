@@ -16,7 +16,7 @@ namespace ViandasDelSur.Services.Implementations
         private readonly Encrypter _encrypter;
 
         public UsersService(
-            IUserRepository userRepository, 
+            IUserRepository userRepository,
             ILocationRepository locationRepository,
             IVerificationService verificationService
             )

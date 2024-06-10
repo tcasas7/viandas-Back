@@ -152,7 +152,7 @@ namespace ViandasDelSur.Services.Implementations
                 // Si hay una imagen anterior, elimínala
                 if (dbImage != null)
                 {
-                    _imageTool.DeleteImage(dbImage.route);
+                    _imageTool.DeleteImage(dbImage.route, dbImage.name);
                     _imageRepository.Remove(dbImage);
                 }
 

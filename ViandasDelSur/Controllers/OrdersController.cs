@@ -19,7 +19,7 @@ namespace ViandasDelSur.Controllers
         }
 
         [Authorize]
-        [HttpGet]
+        [HttpGet("{email}")]
         public ActionResult<AnyType> GetAll(string email)
         {
             Response response = new Response();
