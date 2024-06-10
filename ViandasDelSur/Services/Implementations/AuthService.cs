@@ -50,7 +50,7 @@ namespace ViandasDelSur.Services.Implementations
                 {
                     new Claim("Account", email),
                     new Claim("Role", role)
-                };
+                };    
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("JWT:Key").Value));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
