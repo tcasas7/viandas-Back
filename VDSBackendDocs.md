@@ -29,6 +29,8 @@ Id: **number**
 
 dir: **string**
 
+isDefault: **boolean**
+
 userId: **number**
 
 User: **User**
@@ -37,6 +39,8 @@ User: **User**
 Id: **number**
 
 category: **string**
+
+price: **number**
 
 validDate: **DateTime**
 
