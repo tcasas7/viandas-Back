@@ -29,6 +29,8 @@ Id: **number**
 
 dir: **string**
 
+isDefault: **boolean**
+
 userId: **number**
 
 User: **User**
@@ -37,6 +39,8 @@ User: **User**
 Id: **number**
 
 category: **string**
+
+price: **number**
 
 validDate: **DateTime**
 
@@ -167,6 +171,8 @@ Id: **number**
 
 dir: **string**
 
+isDefault: **boolean**
+
 ### LoginDTO
 email: **string**
 
@@ -178,6 +184,8 @@ Id: **number**
 category: **string**
 
 validDate: **DateTime**
+
+price: **double**
 
 ### OrderDTO
 Id: **number**
@@ -193,6 +201,9 @@ description: **string**
 orderDate: **DateTime**
 
 deliveries: **List[DeliveryDTO]**
+
+### PlaceOrderDTO
+Id: **List[OrderDTO]**
 
 ### ProductDTO
 Id: **number**
@@ -297,10 +308,10 @@ Description: **Returns all the orders of the logged User.**<br>
 
 Type: **POST**<br>
 Endpoint: **/api/Orders/place**<br>
-Body: **OrderDTO**<br>
+Body: **PlaceOrderDTO**<br>
 Header: **Authorize**<br>
 Response: **Response**<br>
-Description: **Places the given order saving it into the DB.**<br>
+Description: **Places the given orders saving it into the DB.**<br>
 
 Type: **POST**<br>
 Endpoint: **/api/Orders/remove/$orderId**<br>
