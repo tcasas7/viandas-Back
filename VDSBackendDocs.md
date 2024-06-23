@@ -202,6 +202,9 @@ orderDate: **DateTime**
 
 deliveries: **List[DeliveryDTO]**
 
+### PlaceOrderDTO
+Id: **List[OrderDTO]**
+
 ### ProductDTO
 Id: **number**
 
