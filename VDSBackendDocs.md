@@ -308,7 +308,7 @@ Description: **Returns all the orders of the logged User.**<br>
 
 Type: **POST**<br>
 Endpoint: **/api/Orders/place**<br>
-Body: **List[OrderDTO]**<br>
+Body: **PlaceOrderDTO**<br>
 Header: **Authorize**<br>
 Response: **Response**<br>
 Description: **Places the given orders saving it into the DB.**<br>
