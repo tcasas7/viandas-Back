@@ -305,10 +305,10 @@ Description: **Returns all the orders of the logged User.**<br>
 
 Type: **POST**<br>
 Endpoint: **/api/Orders/place**<br>
-Body: **OrderDTO**<br>
+Body: **List[OrderDTO]**<br>
 Header: **Authorize**<br>
 Response: **Response**<br>
-Description: **Places the given order saving it into the DB.**<br>
+Description: **Places the given orders saving it into the DB.**<br>
 
 Type: **POST**<br>
 Endpoint: **/api/Orders/remove/$orderId**<br>
