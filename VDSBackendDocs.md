@@ -349,6 +349,13 @@ Header: **Authorize**<br>
 Response: **Response**<br>
 Description: **Changes the given user Role (Admin use only).**<br>
 
+Type: **POST**<br>
+Endpoint: **/api/Users/changePhone/?phone**<br>
+Body: **null**<br>
+Header: **Authorize**<br>
+Response: **Response**<br>
+Description: **Changes the user's phone number for the given one.**<br>
+
 Type: **GET**<br>
 Endpoint: **/api/Users/data**<br>
 Body: **null**<br>
@@ -362,6 +369,13 @@ Body: **LocationDTO**<br>
 Header: **Authorize**<br>
 Response: **Response**<br>
 Description: **Adds the given location to the logged User's info.**<br>
+
+Type: **POST**<br>
+Endpoint: **/api/Users/makeDefault**<br>
+Body: **LocationDTO**<br>
+Header: **Authorize**<br>
+Response: **Response**<br>
+Description: **Replaces the default location for the given one.**<br>
 
 Type: **POST**<br>
 Endpoint: **/api/Users/removeLocation**<br>
