@@ -13,6 +13,7 @@ namespace ViandasDelSur.Services.Interfaces
         public Response ChangePhone(string email, string phone);
         public Response Data(string email);
         public Response AddLocation(LocationDTO model, string email);
+        public Response MakeDefault(LocationDTO model, string email);
         public Response RemoveLocation(LocationDTO model, string email);
     }
 }

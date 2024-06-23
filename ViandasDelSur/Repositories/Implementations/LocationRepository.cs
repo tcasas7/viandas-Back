@@ -12,6 +12,11 @@ namespace ViandasDelSur.Repositories.Implementations
             return FindByCondition(l => l.Id == id).FirstOrDefault();
         }
 
+        public Location GetDefault(string email)
+        {
+            return FindByCondition(l => l.User.email == email && l.isDefault).FirstOrDefault();
+        }
+
         public void Remove(Location location)
         {
             Delete(location);

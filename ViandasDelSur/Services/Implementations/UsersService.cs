@@ -224,8 +224,45 @@ namespace ViandasDelSur.Services.Implementations
             response.message = "Ok";
 
             return response;
-        } 
-        
+        }
+
+        public Response MakeDefault(LocationDTO model, string email)
+        {
+            Response response = new Response();
+
+            var user = _userRepository.FindByEmail(email);
+
+            if (user == null)
+            {
+                response.statusCode = 401;
+                response.message = "Sesión invalida";
+                return response;
+            }
+
+            var newLocation = _locationRepository.FindById(model.Id);
+
+            if (newLocation == null || newLocation.userId != user.Id)
+            {
+                response.statusCode = 404;
+                response.message = "Dirección no encontrada";
+                return response;
+            }
+
+            var oldLocation = _locationRepository.GetDefault(email);
+
+            if (oldLocation != null)
+                oldLocation.isDefault = false;
+
+            newLocation.isDefault = true;
+
+            _locationRepository.Save(oldLocation);
+            _locationRepository.Save(newLocation);
+
+            response.statusCode = 200;
+            response.message = "Ok";
+            return response;
+        }
+
         public Response RemoveLocation(LocationDTO model, string email)
         {
             Response response = new Response();

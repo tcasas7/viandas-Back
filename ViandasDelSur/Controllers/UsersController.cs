@@ -199,6 +199,35 @@ namespace ViandasDelSur.Controllers
         }
 
         [Authorize]
+        [HttpPost("makeDefault")]
+        public ActionResult<AnyType> MakeDefault([FromBody] LocationDTO model)
+        {
+            Response response = new Response();
+            try
+            {
+                if (String.IsNullOrEmpty(model.dir))
+                {
+                    response.statusCode = 400;
+                    response.message = "Datos invalidos";
+                    return new JsonResult(response);
+                }
+
+                string email = User.FindFirst("Account") != null ? User.FindFirst("Account").Value : string.Empty;
+
+                response = _usersService.MakeDefault(model, email);
+
+                return new JsonResult(response);
+            }
+            catch (Exception e)
+            {
+                response.statusCode = 500;
+                response.message = e.Message;
+                return new JsonResult(response);
+            }
+        }
+
+
+        [Authorize]
         [HttpPost("removeLocation")]
         public ActionResult<AnyType> RemoveLocation([FromBody] LocationDTO model)
         {

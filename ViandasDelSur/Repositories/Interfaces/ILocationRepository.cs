@@ -6,6 +6,7 @@ namespace ViandasDelSur.Repositories.Interfaces
     {
         void Save(Location location);
         Location FindById(long id);
+        Location GetDefault(string email);
         void Remove(Location location);
     }
 }
