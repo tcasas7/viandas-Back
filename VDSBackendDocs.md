@@ -171,6 +171,8 @@ Id: **number**
 
 dir: **string**
 
+isDefault: **boolean**
+
 ### LoginDTO
 email: **string**
 
@@ -182,6 +184,8 @@ Id: **number**
 category: **string**
 
 validDate: **DateTime**
+
+price: **double**
 
 ### OrderDTO
 Id: **number**
