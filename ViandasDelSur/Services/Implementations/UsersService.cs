@@ -251,11 +251,12 @@ namespace ViandasDelSur.Services.Implementations
             var oldLocation = _locationRepository.GetDefault(email);
 
             if (oldLocation != null)
+            {
                 oldLocation.isDefault = false;
+                _locationRepository.Save(oldLocation);
+            }
 
             newLocation.isDefault = true;
-
-            _locationRepository.Save(oldLocation);
             _locationRepository.Save(newLocation);
 
             response.statusCode = 200;
