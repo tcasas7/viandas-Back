@@ -64,14 +64,14 @@ namespace ViandasDelSur.Controllers
 
         [Authorize]
         [HttpPost("place")]
-        public ActionResult<AnyType> Place( [FromBody] OrderDTO model)
+        public ActionResult<AnyType> Place( [FromBody] PlaceOrderDTO model)
         {
             Response response = new Response();
             try
             {
                 string email = User.FindFirst("Account") != null ? User.FindFirst("Account").Value : string.Empty;
 
-                response = _ordersService.Place(email, model);
+                response = _ordersService.Place(email, model.orders);
 
                 return new JsonResult(response);
             }

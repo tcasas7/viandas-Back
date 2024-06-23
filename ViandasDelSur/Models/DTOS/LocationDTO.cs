@@ -4,6 +4,7 @@
     {
         public int Id { get; set; }
         public string dir { get; set; }
+        public bool isDefault { get; set; }
 
         public LocationDTO() { }
 
@@ -11,6 +12,7 @@
         {
             Id = location.Id;
             dir = location.dir;
+            isDefault = location.isDefault;
         }
     }
 }

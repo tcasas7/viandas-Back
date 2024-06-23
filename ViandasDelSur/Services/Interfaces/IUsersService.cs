@@ -10,6 +10,7 @@ namespace ViandasDelSur.Services.Interfaces
         public Response Register(RegisterDTO model);
         public Response ChangePassword(ChangePasswordDTO model);
         public Response ChangeRole(ChangeRoleDTO model, string adminEmail);
+        public Response ChangePhone(string email, string phone);
         public Response Data(string email);
         public Response AddLocation(LocationDTO model, string email);
         public Response RemoveLocation(LocationDTO model, string email);

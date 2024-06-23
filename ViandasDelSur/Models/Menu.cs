@@ -7,6 +7,7 @@ namespace ViandasDelSur.Models
         public int Id { get; set; }
         public string category { get; set; }
         public DateTime validDate { get; set; }
+        public double price { get; set; }
 
         public ICollection<Product> Products { get; set; }
 
@@ -17,6 +18,7 @@ namespace ViandasDelSur.Models
             Id = menuDTO.Id;
             category = menuDTO.category;
             validDate = menuDTO.validDate;
+            price = menuDTO.price;
 
             foreach (var productDTO in menuDTO.products)
             {

@@ -107,7 +107,7 @@ namespace ViandasDelSur.Services.Implementations
             return response;
         }
 
-        public Response Place(string email, OrderDTO model)
+        public Response Place(string email, List<OrderDTO> model)
         {
             Response response = new Response();
 
@@ -120,25 +120,35 @@ namespace ViandasDelSur.Services.Implementations
                 return response;
             }
 
-            Order order = new Order();
-
-            order.Id = model.Id;
-            order.price = model.price;
-            order.paymentMethod = model.paymentMethod;
-            order.hasSalt = model.hasSalt;
-            order.orderDate = model.orderDate;
-            order.Deliveries = new List<Delivery>();
-
-            foreach (var deliveryDTO in model.deliveries)
+            if(model == null)
             {
-                Delivery delivery = new Delivery();
-                delivery.productId = deliveryDTO.productId;
-                delivery.delivered = false;
-                delivery.deliveryDate = DatesTool.GetNextDay(deliveryDTO.deliveryDate);
-                order.Deliveries.Add(delivery);
+                response.statusCode = 400;
+                response.message = "Error";
+                return response;
             }
 
-            _orderRepository.Save(order);
+            foreach (var modelOrder in model)
+            {
+                Order order = new Order();
+
+                order.Id = modelOrder.Id;
+                order.price = modelOrder.price;
+                order.paymentMethod = modelOrder.paymentMethod;
+                order.hasSalt = modelOrder.hasSalt;
+                order.orderDate = modelOrder.orderDate;
+                order.Deliveries = new List<Delivery>();
+
+                foreach (var deliveryDTO in modelOrder.deliveries)
+                {
+                    Delivery delivery = new Delivery();
+                    delivery.productId = deliveryDTO.productId;
+                    delivery.delivered = false;
+                    delivery.deliveryDate = DatesTool.GetNextDay(deliveryDTO.deliveryDate);
+                    order.Deliveries.Add(delivery);
+                }
+
+                _orderRepository.Save(order);
+            }
 
             response.statusCode = 200;
             response.message = "Ok";

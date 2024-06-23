@@ -128,6 +128,27 @@ namespace ViandasDelSur.Controllers
         }
 
         [Authorize]
+        [HttpPost("changePhone/{phone}")]
+        public ActionResult<AnyType> ChangePhone(string phone)
+        {
+            Response response = new Response();
+            try
+            {
+                string email = User.FindFirst("Account") != null ? User.FindFirst("Account").Value : string.Empty;
+
+                response = _usersService.ChangePhone(email, phone);
+
+                return new JsonResult(response);
+            }
+            catch (Exception e)
+            {
+                response.statusCode = 500;
+                response.message = e.Message;
+                return new JsonResult(response);
+            }
+        }
+
+        [Authorize]
         [HttpGet("data")]
         public ActionResult<AnyType> Data()
         {

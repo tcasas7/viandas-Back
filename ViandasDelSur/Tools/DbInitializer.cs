@@ -35,7 +35,7 @@ namespace ViandasDelSur.Tools
                     firstName = "Francisco",
                     lastName = "Fernandez",
                     email = "cejita678@gmail.com",
-                    phone = "+542235834483",
+                    phone = "+54 2235834483",
                     hash = hash,
                     salt = salt
                 };
@@ -49,14 +49,17 @@ namespace ViandasDelSur.Tools
                 Menu menuEstandar = new Menu();
                 menuEstandar.category = "Estandar";
                 menuEstandar.validDate = DatesTool.GetNextDay(DayOfWeek.Monday);
+                menuEstandar.price = 4900;
 
                 Menu menuLight = new Menu();
                 menuLight.category = "Light";
                 menuLight.validDate = DatesTool.GetNextDay(DayOfWeek.Monday);
+                menuLight.price = 4500;
 
                 Menu menuProteico = new Menu();
                 menuProteico.category = "Proteico";
                 menuProteico.validDate = DatesTool.GetNextDay(DayOfWeek.Monday);
+                menuProteico.price = 5200;
 
                 context.Menus.Add(menuEstandar);
                 context.Menus.Add(menuLight);

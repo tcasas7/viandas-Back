@@ -5,6 +5,7 @@
         public int Id { get; set; }
         public string category { get; set; }
         public DateTime validDate { get; set; }
+        public double price { get; set; }
 
         public List<ProductDTO> products { get; set; } = new List<ProductDTO>();
 
@@ -13,6 +14,7 @@
             Id = menu.Id;
             category = menu.category;
             validDate = menu.validDate;
+            price = menu.price;
 
             foreach (var product in menu.Products)
             {

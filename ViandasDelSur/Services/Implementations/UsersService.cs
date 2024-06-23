@@ -157,6 +157,28 @@ namespace ViandasDelSur.Services.Implementations
             return response;
         }
 
+        public Response ChangePhone(string email, string phone)
+        {
+            Response response = new Response();
+
+            var user = _userRepository.FindByEmail(email);
+
+            if (user == null)
+            {
+                response.statusCode = 404;
+                response.message = "Usuario no encontrado";
+                return response;
+            }
+
+            user.phone = phone;
+
+            _userRepository.Save(user);
+
+            response.statusCode = 200;
+            response.message = "Ok";
+            return response;
+        }
+
         public Response Data(string email)
         {
             Response response = new Response();
