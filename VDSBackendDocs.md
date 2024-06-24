@@ -118,6 +118,8 @@ Orders: **ICollection[Order]**
 
 1: **TRANSFERENCIA**
 
+2: **MERCADOPAGO**
+
 ### Role
 0: **CLIENT**
 
