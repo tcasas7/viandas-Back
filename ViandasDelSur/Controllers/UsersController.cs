@@ -128,15 +128,15 @@ namespace ViandasDelSur.Controllers
         }
 
         [Authorize]
-        [HttpPost("changePhone/{phone}")]
-        public ActionResult<AnyType> ChangePhone(string phone)
+        [HttpPost("changePhone")]
+        public ActionResult<AnyType> ChangePhone([FromBody] ChangePhoneDTO model)
         {
             Response response = new Response();
             try
             {
                 string email = User.FindFirst("Account") != null ? User.FindFirst("Account").Value : string.Empty;
 
-                response = _usersService.ChangePhone(email, phone);
+                response = _usersService.ChangePhone(model, email);
 
                 return new JsonResult(response);
             }

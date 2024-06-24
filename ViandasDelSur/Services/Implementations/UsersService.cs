@@ -157,7 +157,7 @@ namespace ViandasDelSur.Services.Implementations
             return response;
         }
 
-        public Response ChangePhone(string email, string phone)
+        public Response ChangePhone(ChangePhoneDTO model, string email)
         {
             Response response = new Response();
 
@@ -170,7 +170,7 @@ namespace ViandasDelSur.Services.Implementations
                 return response;
             }
 
-            user.phone = phone;
+            user.phone = model.phone;
 
             _userRepository.Save(user);
 
