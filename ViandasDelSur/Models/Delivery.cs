@@ -5,6 +5,7 @@
         public int Id { get; set; }
         public bool delivered { get; set; }
         public DateTime deliveryDate { get; set; }
+        public int quantity { get; set; }
 
         public int orderId { get; set; }
         public Order Order { get; set; }

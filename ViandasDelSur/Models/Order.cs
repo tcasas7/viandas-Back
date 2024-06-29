@@ -10,6 +10,7 @@ namespace ViandasDelSur.Models
         public bool hasSalt { get; set; }
         public string description { get; set; }
         public DateTime orderDate { get; set; }
+        public string location { get; set; }
 
         public int userId { get; set; }
         public User User { get; set; }

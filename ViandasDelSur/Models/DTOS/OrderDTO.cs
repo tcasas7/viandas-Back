@@ -10,6 +10,7 @@ namespace ViandasDelSur.Models.DTOS
         public bool hasSalt { get; set; }
         public string description { get; set; }
         public DateTime orderDate { get; set; }
+        public string location { get; set; }
 
         public List<DeliveryDTO> deliveries { get; set; } = new List<DeliveryDTO>();
 
@@ -26,6 +27,7 @@ namespace ViandasDelSur.Models.DTOS
             hasSalt = order.hasSalt;
             description = order.description;
             orderDate = order.orderDate;
+            location = order.location;
 
             foreach (var delivery in order.Deliveries)
             {

@@ -144,6 +144,7 @@ namespace ViandasDelSur.Services.Implementations
                     delivery.productId = deliveryDTO.productId;
                     delivery.delivered = false;
                     delivery.deliveryDate = DatesTool.GetNextDay(deliveryDTO.deliveryDate);
+                    delivery.quantity = deliveryDTO.quantity;
                     order.Deliveries.Add(delivery);
                 }
 
