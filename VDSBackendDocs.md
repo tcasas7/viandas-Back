@@ -61,6 +61,8 @@ orderDate: **DateTime**
 
 userId: **number**
 
+location: **string**
+
 User: **User**
 
 Deliveries: **ICollecion[Delivery]**
