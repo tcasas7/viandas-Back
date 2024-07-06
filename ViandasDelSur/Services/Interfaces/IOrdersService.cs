@@ -7,7 +7,7 @@ namespace ViandasDelSur.Services.Interfaces
     {
         Response GetAll(string adminEmail, string email);
         Response GetOwn(string email);
-        Response Place(string email, List<OrderDTO> model);
+        Response Place(string email, ICollection<OrderDTO> model);
         Response Remove(string email, int orderId);
     }
 }

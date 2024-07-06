@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Any;
+using Newtonsoft.Json;
 using ViandasDelSur.Models.DTOS;
 using ViandasDelSur.Models.Responses;
 using ViandasDelSur.Services.Interfaces;
@@ -69,9 +70,11 @@ namespace ViandasDelSur.Controllers
             Response response = new Response();
             try
             {
+                Console.WriteLine($"Received model: {JsonConvert.SerializeObject(model)}");
+
                 string email = User.FindFirst("Account") != null ? User.FindFirst("Account").Value : string.Empty;
 
-                response = _ordersService.Place(email, model.orders);
+                response = _ordersService.Place(email, model.Orders);
 
                 return new JsonResult(response);
             }

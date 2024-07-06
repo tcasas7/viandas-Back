@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using System;
 using System.Text;
 using ViandasDelSur.Models;
@@ -14,7 +15,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddNewtonsoftJson( options =>
+{
+    options.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
+    options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -58,6 +63,7 @@ builder.Services.AddDbContext<VDSContext>(options =>
         builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
     });
 });
+
 //Adds repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ILocationRepository, LocationRepository>();

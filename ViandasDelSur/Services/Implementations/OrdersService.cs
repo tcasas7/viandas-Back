@@ -107,7 +107,7 @@ namespace ViandasDelSur.Services.Implementations
             return response;
         }
 
-        public Response Place(string email, List<OrderDTO> model)
+        public Response Place(string email, ICollection<OrderDTO> model)
         {
             Response response = new Response();
 

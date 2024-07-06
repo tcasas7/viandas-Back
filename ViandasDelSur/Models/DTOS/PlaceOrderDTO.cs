@@ -2,6 +2,6 @@
 {
     public class PlaceOrderDTO
     {
-        public List<OrderDTO> orders;
+        public ICollection<OrderDTO> Orders;
     }
 }
