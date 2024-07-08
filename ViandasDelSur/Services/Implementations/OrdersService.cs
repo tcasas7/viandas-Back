@@ -145,12 +145,15 @@ namespace ViandasDelSur.Services.Implementations
 
                     foreach (var deliveryDTO in modelOrder.deliveries)
                     {
-                        Delivery delivery = new Delivery();
-                        delivery.productId = deliveryDTO.productId;
-                        delivery.delivered = false;
-                        delivery.deliveryDate = DatesTool.GetNextDay(deliveryDTO.deliveryDate);
-                        delivery.quantity = deliveryDTO.quantity;
-                        order.Deliveries.Add(delivery);
+                        if (deliveryDTO.quantity != 0)
+                        {
+                            Delivery delivery = new Delivery();
+                            delivery.productId = deliveryDTO.productId;
+                            delivery.delivered = false;
+                            delivery.deliveryDate = DatesTool.GetNextWeekDay(deliveryDTO.deliveryDate);
+                            delivery.quantity = deliveryDTO.quantity;
+                            order.Deliveries.Add(delivery);
+                        }
                     }
                     _orderRepository.Save(order);
                 }
