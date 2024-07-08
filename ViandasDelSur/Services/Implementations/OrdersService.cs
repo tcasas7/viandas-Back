@@ -12,15 +12,19 @@ namespace ViandasDelSur.Services.Implementations
         private readonly IUserRepository _userRepository;
         private readonly IOrderRepository _orderRepository;
         private readonly IVerificationService _verificationService;
+        private readonly IDeliveryRepository _deliveryRepository;
 
         public OrdersService(
             IUserRepository userRepository,
             IOrderRepository orderRepository,
-            IVerificationService verificationService)
+            IVerificationService verificationService,
+            IDeliveryRepository deliveryRepository)
         {
             _userRepository = userRepository;
             _orderRepository = orderRepository;
             _verificationService = verificationService;
+            _deliveryRepository = deliveryRepository;
+
         }
 
         public Response GetAll(string adminEmail, string email)
@@ -94,6 +98,12 @@ namespace ViandasDelSur.Services.Implementations
                 return response;
             }
 
+            foreach (var order in user.Orders)
+            {
+                List<Delivery> del = _deliveryRepository.GetByOrder(order.Id).ToList();
+                order.Deliveries = del;
+            }   
+
             List<OrderDTO> result = new List<OrderDTO>();
 
             foreach (var order in user.Orders)
@@ -148,6 +158,7 @@ namespace ViandasDelSur.Services.Implementations
                         if (deliveryDTO.quantity != 0)
                         {
                             Delivery delivery = new Delivery();
+                            delivery.orderId = order.Id;
                             delivery.productId = deliveryDTO.productId;
                             delivery.delivered = false;
                             delivery.deliveryDate = DatesTool.GetNextWeekDay(deliveryDTO.deliveryDate);
