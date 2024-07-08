@@ -135,8 +135,10 @@ namespace ViandasDelSur.Services.Implementations
                 order.price = modelOrder.price;
                 order.paymentMethod = modelOrder.paymentMethod;
                 order.hasSalt = modelOrder.hasSalt;
-                order.orderDate = modelOrder.orderDate;
+                order.orderDate = modelOrder.orderDate ;
                 order.Deliveries = new List<Delivery>();
+                order.userId = user.Id;
+                order.location = modelOrder.location;
 
                 foreach (var deliveryDTO in modelOrder.deliveries)
                 {
