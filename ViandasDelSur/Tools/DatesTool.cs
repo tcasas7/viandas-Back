@@ -8,7 +8,7 @@
             int daysUntilNextDay = ((int)day - (int)today.DayOfWeek + 7) % 7;
 
             if (daysUntilNextDay == 0)
-                daysUntilNextDay = 7;
+                daysUntilNextDay = 6;
 
             DateTime nextDay = today.AddDays(daysUntilNextDay);
 

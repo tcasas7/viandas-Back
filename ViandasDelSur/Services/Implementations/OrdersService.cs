@@ -129,28 +129,31 @@ namespace ViandasDelSur.Services.Implementations
 
             foreach (var modelOrder in model)
             {
-                Order order = new Order();
-
-                order.Id = modelOrder.Id;
-                order.price = modelOrder.price;
-                order.paymentMethod = modelOrder.paymentMethod;
-                order.hasSalt = modelOrder.hasSalt;
-                order.orderDate = modelOrder.orderDate ;
-                order.Deliveries = new List<Delivery>();
-                order.userId = user.Id;
-                order.location = modelOrder.location;
-
-                foreach (var deliveryDTO in modelOrder.deliveries)
+                if(modelOrder.price != 0)
                 {
-                    Delivery delivery = new Delivery();
-                    delivery.productId = deliveryDTO.productId;
-                    delivery.delivered = false;
-                    delivery.deliveryDate = DatesTool.GetNextDay(deliveryDTO.deliveryDate);
-                    delivery.quantity = deliveryDTO.quantity;
-                    order.Deliveries.Add(delivery);
-                }
+                    Order order = new Order();
 
-                _orderRepository.Save(order);
+                    order.Id = modelOrder.Id;
+                    order.price = modelOrder.price;
+                    order.paymentMethod = modelOrder.paymentMethod;
+                    order.hasSalt = modelOrder.hasSalt;
+                    order.orderDate = modelOrder.orderDate;
+                    order.Deliveries = new List<Delivery>();
+                    order.userId = user.Id;
+                    order.location = modelOrder.location;
+                    order.description = modelOrder.description;
+
+                    foreach (var deliveryDTO in modelOrder.deliveries)
+                    {
+                        Delivery delivery = new Delivery();
+                        delivery.productId = deliveryDTO.productId;
+                        delivery.delivered = false;
+                        delivery.deliveryDate = DatesTool.GetNextDay(deliveryDTO.deliveryDate);
+                        delivery.quantity = deliveryDTO.quantity;
+                        order.Deliveries.Add(delivery);
+                    }
+                    _orderRepository.Save(order);
+                }
             }
 
             response.statusCode = 200;
