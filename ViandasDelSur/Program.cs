@@ -72,6 +72,7 @@ builder.Services.AddScoped<IDeliveryRepository, DeliveryRepository>();
 builder.Services.AddScoped<IMenuRepository, MenuRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IImageRepository, ImageRepository>();
+builder.Services.AddScoped<IContactRepository, ContactRepository>();
 
 //Adds services
 builder.Services.AddScoped<IAuthService, AuthService>();

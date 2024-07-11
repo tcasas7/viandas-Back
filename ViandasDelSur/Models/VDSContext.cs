@@ -13,5 +13,6 @@ namespace ViandasDelSur.Models
         public DbSet<Menu> Menus { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Image> Images { get; set; }
+        public DbSet<Contact> Contacts { get; set; }
     }
 }

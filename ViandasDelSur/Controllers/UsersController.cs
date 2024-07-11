@@ -255,5 +255,130 @@ namespace ViandasDelSur.Controllers
                 return new JsonResult(response);
             }
         }
+        [Authorize]
+        [HttpPost("addContact")]
+        public ActionResult<AnyType> AddContact([FromBody] ContactDTO model)
+        {
+            Response response = new Response();
+
+            try
+            {
+                string email = User.FindFirst("Account") != null ? User.FindFirst("Account").Value : string.Empty;
+
+                response = _usersService.AddContact(model, email);
+
+                return new JsonResult(response);
+            }
+            catch (Exception e)
+            {
+                response.statusCode = 500;
+                response.message = e.Message;
+                return new JsonResult(response);
+            }
+
+        }
+
+        [Authorize]
+        [HttpGet("getContacts")]
+        public ActionResult<AnyType> GetAllContacts()
+        {
+            Response response = new Response();
+            try
+            {
+                string email = User.FindFirst("Account") != null ? User.FindFirst("Account").Value : string.Empty;
+
+                response = _usersService.GetAllContacts(email);
+
+                return new JsonResult(response);
+            }
+            catch (Exception e)
+            {
+                response.statusCode = 500;
+                response.message = e.Message;
+                return new JsonResult(response);
+            }
+        }
+
+        [Authorize]
+        [HttpGet("getActiveContact")]
+        public ActionResult<AnyType> GetActiveContact()
+        {
+            Response response = new Response();
+            try
+            {
+                string email = User.FindFirst("Account") != null ? User.FindFirst("Account").Value : string.Empty;
+
+                response = _usersService.GetActiveContact(email);
+
+                return new JsonResult(response);
+            }
+            catch (Exception e)
+            {
+                response.statusCode = 500;
+                response.message = e.Message;
+                return new JsonResult(response);
+            }
+        }
+
+        [Authorize]
+        [HttpPost("updateContact")]
+        public ActionResult<AnyType> UpdateContact([FromBody] ContactDTO model)
+        {
+            Response response = new Response();
+            try
+            {
+                string email = User.FindFirst("Account") != null ? User.FindFirst("Account").Value : string.Empty;
+
+                response = _usersService.UpdateContact(model, email);
+
+                return new JsonResult(response);
+            }
+            catch (Exception e)
+            {
+                response.statusCode = 500;
+                response.message = e.Message;
+                return new JsonResult(response);
+            }
+        }
+        [Authorize]
+        [HttpPost("removeContact")]
+        public ActionResult<AnyType> RemoveContact([FromBody] ContactDTO model)
+        {
+            Response response = new Response();
+            try
+            {
+                string email = User.FindFirst("Account") != null ? User.FindFirst("Account").Value : string.Empty;
+
+                response = _usersService.RemoveContact(model, email);
+
+                return new JsonResult(response);
+            }
+            catch (Exception e)
+            {
+                response.statusCode = 500;
+                response.message = e.Message;
+                return new JsonResult(response);
+            }
+        }
+        [Authorize]
+        [HttpPost("makeActive")]
+        public ActionResult<AnyType> MakeActive([FromBody] ContactDTO model)
+        {
+            Response response = new Response();
+            try
+            {
+                string email = User.FindFirst("Account") != null ? User.FindFirst("Account").Value : string.Empty;
+
+                response = _usersService.MakeActive(model, email);
+
+                return new JsonResult(response);
+            }
+            catch (Exception e)
+            {
+                response.statusCode = 500;
+                response.message = e.Message;
+                return new JsonResult(response);
+            }
+        }
     }
 }

@@ -2,6 +2,7 @@
 using ViandasDelSur.Models.DTOS;
 using ViandasDelSur.Models.Enums;
 using ViandasDelSur.Models.Responses;
+using ViandasDelSur.Repositories.Implementations;
 using ViandasDelSur.Repositories.Interfaces;
 using ViandasDelSur.Services.Interfaces;
 using ViandasDelSur.Tools;
@@ -13,17 +14,20 @@ namespace ViandasDelSur.Services.Implementations
         private readonly IUserRepository _userRepository;
         private readonly ILocationRepository _locationRepository;
         private readonly IVerificationService _verificationService;
+        private readonly IContactRepository _contactRepository;
         private readonly Encrypter _encrypter;
 
         public UsersService(
             IUserRepository userRepository,
             ILocationRepository locationRepository,
-            IVerificationService verificationService
+            IVerificationService verificationService,
+            IContactRepository contactRepository
             )
         {
             _userRepository = userRepository;
             _locationRepository = locationRepository;
             _verificationService = verificationService;
+            _contactRepository = contactRepository;
             _encrypter = new Encrypter();
         }
 
@@ -290,6 +294,239 @@ namespace ViandasDelSur.Services.Implementations
 
             response.statusCode = 200;
             response.message = "Ok";
+            return response;
+        }
+        public Response GetAllContacts(string email)
+        {
+            Response response = new Response();
+
+            var user = _userRepository.FindByEmail(email);
+
+            if (user == null)
+            {
+                response.statusCode = 401;
+                response.message = "Sesión invalida";
+                return response;
+            }
+
+            response = _verificationService.VerifyAdmin(user);
+
+            if (response.statusCode != 200)
+                return response;
+
+            var contacts = _contactRepository.GetAll().ToList();
+
+            if (contacts == null)
+            {
+                response.statusCode = 404;
+                response.message = "Contactos no encontrados";
+                return response;
+            }
+
+            List<ContactDTO> result = new List<ContactDTO>();
+
+            foreach (var contact in contacts)
+            {
+                ContactDTO contactDTO = new ContactDTO(contact);
+                result.Add(contactDTO);
+            }
+
+            response = new ResponseCollection<ContactDTO>(200, "Ok", result);
+
+            return response;
+        }
+
+        public Response GetActiveContact(string email)
+        {
+            Response response = new Response();
+
+            var user = _userRepository.FindByEmail(email);
+
+            if (user == null)
+            {
+                response.statusCode = 401;
+                response.message = "Sesión invalida";
+                return response;
+            }
+
+            response = _verificationService.VerifyAdmin(user);
+
+            if (response.statusCode != 200)
+                return response;
+
+            var activeContact = _contactRepository.GetActive();
+
+            if (activeContact == null)
+            {
+                response.statusCode = 404;
+                response.message = "Contacto activo no encontrado";
+                return response;
+            }
+
+            ContactDTO contactDTO = new ContactDTO(activeContact);
+
+            response = new ResponseModel<ContactDTO>(200, "Ok", contactDTO);
+
+            return response;
+        }
+        public Response AddContact(ContactDTO model, string email)
+        {
+            Response response = new Response();
+
+            var user = _userRepository.FindByEmail(email);
+
+            if (user == null)
+            {
+                response.statusCode = 401;
+                response.message = "Sesión invalida";
+                return response;
+            }
+
+            response = _verificationService.VerifyAdmin(user);
+
+            if (response.statusCode != 200)
+                return response;
+
+            if (model.Id != 0)
+            {
+                response.statusCode = 400;
+                response.message = "Datos invalidos";
+                return response;
+            }
+
+            Contact newContact = new Contact(model);
+            newContact.isActive = false;
+
+            _contactRepository.Save(newContact);
+
+            response.statusCode = 200;
+            response.message = "Ok";
+
+            return response;
+        }
+        public Response UpdateContact(ContactDTO model, string email)
+        {
+            Response response = new Response();
+
+            var user = _userRepository.FindByEmail(email);
+
+            if (user == null)
+            {
+                response.statusCode = 401;
+                response.message = "Sesión invalida";
+                return response;
+            }
+
+            response = _verificationService.VerifyAdmin(user);
+
+            if (response.statusCode != 200)
+                return response;
+
+            if (model.Id == 0)
+            {
+                response.statusCode = 400;
+                response.message = "Datos invalidos";
+                return response;
+            }
+
+            var contact = _contactRepository.GetById(model.Id);
+
+            if (contact == null)
+            {
+                response.statusCode = 404;
+                response.message = "Contacto no encontrado";
+                return response;
+            }
+            contact = new Contact(model);
+
+            _contactRepository.Save(contact);
+
+            response.statusCode = 200;
+            response.message = "Ok";
+
+            return response;
+        }
+
+        public Response RemoveContact(ContactDTO model, string email)
+        {
+            Response response = new Response();
+
+            var user = _userRepository.FindByEmail(email);
+
+            if (user == null)
+            {
+                response.statusCode = 401;
+                response.message = "Sesión invalida";
+                return response;
+            }
+
+            response = _verificationService.VerifyAdmin(user);
+
+            if (response.statusCode != 200)
+                return response;
+
+            var contact = _contactRepository.GetById(model.Id);
+
+            if (contact == null)
+            {
+                response.statusCode = 404;
+                response.message = "Contacto no encontrado";
+                return response;
+            }
+
+            _contactRepository.Remove(contact);
+
+            response.statusCode = 200;
+            response.message = "Ok";
+
+            return response;
+        }
+
+        public Response MakeActive(ContactDTO model, string email)
+        {
+            Response response = new Response();
+
+            var user = _userRepository.FindByEmail(email);
+
+            if (user == null)
+            {
+                response.statusCode = 401;
+                response.message = "Sesión invalida";
+                return response;
+            }
+
+            response = _verificationService.VerifyAdmin(user);
+
+            if (response.statusCode != 200)
+                return response;
+
+            var contact = _contactRepository.GetById(model.Id);
+
+            if (contact == null)
+            {
+                response.statusCode = 404;
+                response.message = "Contacto no encontrado";
+                return response;
+            }
+
+            var activeContact = _contactRepository.GetActive();
+            contact.isActive = true;
+
+            _contactRepository.Save(contact);
+
+
+            if (activeContact != null)
+            {
+                if (activeContact.Id != contact.Id)
+                {
+                    activeContact.isActive = false;
+                    _contactRepository.Save(activeContact);
+                }
+            }
+
+            response.statusCode = 200;
+            response.message = "Ok";
+
             return response;
         }
     }

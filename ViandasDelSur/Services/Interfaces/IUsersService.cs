@@ -15,5 +15,11 @@ namespace ViandasDelSur.Services.Interfaces
         public Response AddLocation(LocationDTO model, string email);
         public Response MakeDefault(LocationDTO model, string email);
         public Response RemoveLocation(LocationDTO model, string email);
+        public Response GetAllContacts(string email);
+        public Response GetActiveContact(string email);
+        public Response AddContact(ContactDTO model, string email);
+        public Response UpdateContact(ContactDTO model, string email);
+        public Response RemoveContact(ContactDTO model, string email);
+        public Response MakeActive(ContactDTO model, string email);
     }
 }
