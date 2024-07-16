@@ -192,19 +192,19 @@ namespace ViandasDelSur.Tools
 
                 e5.menuId = mE.Id;
                 e5.name = "Ternera";
-                e5.day = DayOfWeek.Thursday;
+                e5.day = DayOfWeek.Friday;
                 e5.Image = image;
                 context.Products.Add(e5);
 
                 l5.menuId = mL.Id;
                 l5.name = "Tarta capresse";
-                l5.day = DayOfWeek.Thursday;
+                l5.day = DayOfWeek.Friday;
                 l5.Image = image;
                 context.Products.Add(l5);
 
                 p5.menuId = mP.Id;
                 p5.name = "Planchita de pollo";
-                p5.day = DayOfWeek.Thursday;
+                p5.day = DayOfWeek.Friday;
                 p5.Image = image;
                 context.Products.Add(p5);
 
