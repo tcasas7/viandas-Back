@@ -77,7 +77,7 @@ namespace ViandasDelSur.Controllers
                     return StatusCode(404, "No encontrado");
                 }
 
-                byte[] result = _imageTool.GetImageFromPath(product.Image.route, "Media\\Default.png");
+                byte[] result = _imageTool.GetImageFromPath(product.Image.route, "");
 
                 if (result == null)
                     return StatusCode(404, "Imagen no encontrada");
