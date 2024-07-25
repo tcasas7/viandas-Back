@@ -68,26 +68,19 @@ namespace ViandasDelSur.Controllers
         [HttpGet("image/{id}")]
         public ActionResult<AnyType> ImageByProductId(int id)
         {
-            Response response = new Response();
             try
             {
                 var product = _productRepository.GetById(id);
 
                 if (product == null)
                 {
-                    response.statusCode = 404;
-                    response.message = "No encontrado";
-                    return new JsonResult(response);
+                    return StatusCode(404, "No encontrado");
                 }
 
                 byte[] result = _imageTool.GetImageFromPath(product.Image.route, "Media\\Default.png");
 
                 if (result == null)
-                {
-                    response.statusCode = 404;
-                    response.message = "Imagen no encontrada";
-                    return new JsonResult(response);
-                }
+                    return StatusCode(404, "Imagen no encontrada");
 
                 var file = File(result, "image/png");
 
@@ -95,9 +88,7 @@ namespace ViandasDelSur.Controllers
             }
             catch (Exception e)
             {
-                response.statusCode = 500;
-                response.message = e.Message;
-                return new JsonResult(response);
+                return StatusCode(500, e.Message);
             }
         }
 

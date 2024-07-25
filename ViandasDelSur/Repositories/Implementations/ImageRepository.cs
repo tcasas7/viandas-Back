@@ -11,8 +11,6 @@ namespace ViandasDelSur.Repositories.Implementations
         {
         }
 
-        ImageTool _imageTool = new ImageTool();
-
         public void Save(Image image)
         {
             if (image.Id == 0)
