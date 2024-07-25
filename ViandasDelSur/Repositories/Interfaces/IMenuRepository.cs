@@ -8,5 +8,6 @@ namespace ViandasDelSur.Repositories.Interfaces
         ICollection<Menu> GetAll();
         void Save(Menu menu);
         void Remove(Menu menu);
+        void SaveMenuWithProducts(Menu menu);
     }
 }

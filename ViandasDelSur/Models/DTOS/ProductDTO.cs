@@ -7,6 +7,10 @@
         public string name { get; set; }
         public string imageName { get; set; }
 
+        public ProductDTO()
+        {
+
+        }
         public ProductDTO(Product product) 
         {
             Id = product.Id;

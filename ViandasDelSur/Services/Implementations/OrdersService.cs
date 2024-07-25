@@ -1,4 +1,5 @@
-﻿using ViandasDelSur.Models;
+﻿using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+using ViandasDelSur.Models;
 using ViandasDelSur.Models.DTOS;
 using ViandasDelSur.Models.Responses;
 using ViandasDelSur.Repositories.Interfaces;
@@ -27,11 +28,49 @@ namespace ViandasDelSur.Services.Implementations
 
         }
 
+        public Response GetDates(string adminEmail)
+        {
+            Response response = new Response();
+
+            var adminUser = _userRepository.FindByEmail(adminEmail);
+
+            if (adminUser == null)
+            {
+                response.statusCode = 401;
+                response.message = "Sesión invalida";
+                return response;
+            }
+
+            response = _verificationService.VerifyAdmin(adminUser);
+
+            if (response.statusCode != 200)
+                return response;
+
+            List<DateTime> dates = new List<DateTime>();
+
+            var orders = _orderRepository.GetOrders();
+
+            foreach (Order order in orders)
+            {
+                foreach (Delivery delivery in order.Deliveries)
+                {
+                    if (!dates.Contains(delivery.deliveryDate))
+                    {
+                        dates.Add(delivery.deliveryDate);
+                    }
+                }
+            }
+
+            response = new ResponseCollection<DateTime>(200, "Ok", dates);
+
+            return response;
+        }
+
         public Response GetAll(string adminEmail, string email)
         {
             Response response = new Response();
 
-            var adminUser = _userRepository.FindByEmail(email);
+            var adminUser = _userRepository.FindByEmail(adminEmail);
 
             if (adminUser == null)
             {

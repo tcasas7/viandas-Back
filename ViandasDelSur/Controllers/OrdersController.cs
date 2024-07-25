@@ -19,6 +19,28 @@ namespace ViandasDelSur.Controllers
             _ordersService = ordersService;
         }
 
+
+        [Authorize]
+        [HttpGet("getDates")]
+        public ActionResult<AnyType> GetDates()
+        {
+            Response response = new Response();
+
+            try
+            {
+                string adminEmail = User.FindFirst("Account") != null ? User.FindFirst("Account").Value : string.Empty;
+                response = _ordersService.GetDates(adminEmail);
+
+                return new JsonResult(response);
+            }
+            catch (Exception e)
+            {
+                response.statusCode = 500;
+                response.message = e.Message;
+                return new JsonResult(response);
+            }
+        }
+
         [Authorize]
         [HttpGet("{email}")]
         public ActionResult<AnyType> GetAll(string email)

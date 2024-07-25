@@ -86,18 +86,9 @@ namespace ViandasDelSur.Services.Implementations
                 return response;
             }
 
-            Image placeHolder = _imageRepository.GetByName("Default");
-
-            if (placeHolder == null)
-            {
-                response.statusCode = 400;
-                response.message = "Error";
-                return response;
-            }
-
             foreach (var menuDTO in model.Menus)
             {
-                Menu menu = new Menu(menuDTO, placeHolder);
+                Menu menu = new Menu(menuDTO);
                 menu.validDate = DatesTool.GetNextDay(DayOfWeek.Monday);
                 _menuRepository.Save(menu);
             }
@@ -105,6 +96,49 @@ namespace ViandasDelSur.Services.Implementations
             foreach (var menu in oldMenus)
             {
                 _menuRepository.Remove(menu);
+            }
+
+            var images =_imageRepository.GetAll();
+
+            foreach (var image in images)
+            {
+                _imageTool.DeleteImage(image.route, image.name);
+                _imageRepository.Remove(image);
+            }
+
+            var newMenus = _menuRepository.GetAll();
+
+            if (newMenus == null)
+            {
+                response.statusCode = 404;
+                response.message = "Elementos no encontrados";
+                return response;
+            }
+
+            foreach (var menu in newMenus)
+            {
+                foreach(var menuDTO in model.Menus)
+                {
+                    if (menu.category == menuDTO.category)
+                    {
+                        foreach (var productDTO in menuDTO.products)
+                        {
+                            Image newImage = _imageTool.CreateForNew(productDTO.name);
+
+                            if (newImage == null)
+                            {
+                                response.statusCode = 400;
+                                response.message = "Error";
+                                return response;
+                            }
+
+                            Product product = new Product(productDTO);
+                            product.Image = newImage;
+                            product.menuId = menu.Id;
+                            _productRepository.Save(product);
+                        }
+                    }
+                }
             }
 
             response.statusCode = 200;

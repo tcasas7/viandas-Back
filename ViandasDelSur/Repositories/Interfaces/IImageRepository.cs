@@ -8,5 +8,6 @@ namespace ViandasDelSur.Repositories.Interfaces
         Image GetById(long id);
         Image GetByName(string name);
         void Remove(Image image);
+        ICollection<Image> GetAll();
     }
 }

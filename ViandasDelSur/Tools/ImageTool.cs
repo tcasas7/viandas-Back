@@ -47,7 +47,7 @@ namespace ViandasDelSur.Tools
 
         public bool DeleteImage(string imagePath, string imageName)
         {
-            if (System.IO.File.Exists(imagePath) && imageName.ToUpper() != "DEFAULT".ToUpper())
+            if (System.IO.File.Exists(imagePath) && imagePath.ToUpper() != "DEFAULT.PNG".ToUpper())
             {
                 System.IO.File.Delete(imagePath);
                 return true;
@@ -56,6 +56,14 @@ namespace ViandasDelSur.Tools
             {
                 return false;
             }
+        }
+
+        public Image CreateForNew(string productName)
+        {
+            var newImage = new Image();
+            newImage.name = productName + ".png";
+            newImage.route = "Media\\Default.png";
+            return newImage;
         }
     }
 }

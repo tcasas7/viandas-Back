@@ -9,6 +9,12 @@ namespace ViandasDelSur.Repositories.Implementations
         public OrderRepository(VDSContext repositoryContext) : base(repositoryContext)
         {
         }
+        public IEnumerable<object> GetOrders()
+        {
+            return FindAll()
+                .Include(o => o.Deliveries)
+                .ToList();
+        }
 
         public Order GetById(int id)
         {

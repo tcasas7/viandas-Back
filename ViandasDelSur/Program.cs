@@ -56,12 +56,19 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("AccountOnly", policy => policy.RequireClaim("Account"));
 });
 
+builder.Services.AddLogging(loggingBuilder => {
+    loggingBuilder.AddConsole()
+        .AddFilter(DbLoggerCategory.Database.Command.Name, LogLevel.Information);
+    loggingBuilder.AddDebug();
+});
+
 builder.Services.AddDbContext<VDSContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("VDSConnection"), builder =>
     {
-        builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+        builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);      
     });
+    options.EnableSensitiveDataLogging(true);
 });
 
 //Adds repositories

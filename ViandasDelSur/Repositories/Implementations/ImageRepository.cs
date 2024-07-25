@@ -1,5 +1,7 @@
-﻿using ViandasDelSur.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using ViandasDelSur.Models;
 using ViandasDelSur.Repositories.Interfaces;
+using ViandasDelSur.Tools;
 
 namespace ViandasDelSur.Repositories.Implementations
 {
@@ -8,6 +10,8 @@ namespace ViandasDelSur.Repositories.Implementations
         public ImageRepository(VDSContext repositoryContext) : base(repositoryContext)
         {
         }
+
+        ImageTool _imageTool = new ImageTool();
 
         public void Save(Image image)
         {
@@ -28,12 +32,22 @@ namespace ViandasDelSur.Repositories.Implementations
 
         public Image GetByName(string name)
         {
-            return FindByCondition(i => i.name.ToUpper() == name.ToUpper()).FirstOrDefault();
+            var image = FindByCondition(i => i.name.ToUpper() == name.ToUpper()).FirstOrDefault();
+            if (image != null)
+            {
+                RepositoryContext.Entry(image).State = EntityState.Detached;
+            }
+            return image;
         }
         public void Remove(Image image)
         {
             Delete(image);
             SaveChanges();
+        }
+
+        public ICollection<Image> GetAll()
+        {
+            return FindByCondition(i => i.name != "Default").ToList();
         }
     }
 }

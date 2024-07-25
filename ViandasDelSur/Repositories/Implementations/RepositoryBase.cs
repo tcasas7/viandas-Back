@@ -8,7 +8,7 @@ namespace ViandasDelSur.Repositories.Implementations
 {
     public abstract class RepositoryBase<T> : IRepositoryBase<T> where T : class
     {
-        protected VDSContext RepositoryContext { get; set; }
+        public VDSContext RepositoryContext { get; set; }
 
         public RepositoryBase(VDSContext repositoryContext)
         {
@@ -44,6 +44,7 @@ namespace ViandasDelSur.Repositories.Implementations
         public void Update(T entity)
         {
             RepositoryContext.Set<T>().Update(entity);
+            RepositoryContext.Entry(entity).State = EntityState.Modified;
         }
 
         public void Delete(T entity)

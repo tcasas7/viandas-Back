@@ -19,6 +19,7 @@ namespace ViandasDelSur.Models
             category = menuDTO.category;
             validDate = menuDTO.validDate;
             price = menuDTO.price;
+            Products = new List<Product>();
 
             foreach (var productDTO in menuDTO.products)
             {
@@ -26,6 +27,15 @@ namespace ViandasDelSur.Models
                 product.Image = image;
                 Products.Add(product);
             }
+        }
+
+        public Menu(MenuDTO menuDTO)
+        {
+            Id = menuDTO.Id;
+            category = menuDTO.category;
+            validDate = menuDTO.validDate;
+            price = menuDTO.price;
+            Products = new List<Product>();
         }
     }
 }

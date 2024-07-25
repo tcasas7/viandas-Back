@@ -9,6 +9,10 @@
 
         public List<ProductDTO> products { get; set; } = new List<ProductDTO>();
 
+        public MenuDTO()
+        {
+
+        }
         public MenuDTO(Menu menu) 
         {
             Id = menu.Id;

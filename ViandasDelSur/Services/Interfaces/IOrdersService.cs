@@ -5,6 +5,7 @@ namespace ViandasDelSur.Services.Interfaces
 {
     public interface IOrdersService
     {
+        Response GetDates(string adminEmail);
         Response GetAll(string adminEmail, string email);
         Response GetOwn(string email);
         Response Place(string email, ICollection<OrderDTO> model);
