@@ -121,17 +121,8 @@ namespace ViandasDelSur.Services.Implementations
                     {
                         foreach (var productDTO in menuDTO.products)
                         {
-                            Image newImage = _imageTool.CreateForNew(productDTO.name);
-
-                            if (newImage == null)
-                            {
-                                response.statusCode = 400;
-                                response.message = "Error";
-                                return response;
-                            }
-
                             Product product = new Product(productDTO);
-                            product.Image = newImage;
+                            product.imageId = 1;
                             product.menuId = menu.Id;
                             _productRepository.Save(product);
                         }
