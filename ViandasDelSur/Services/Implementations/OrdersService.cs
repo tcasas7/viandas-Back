@@ -14,18 +14,23 @@ namespace ViandasDelSur.Services.Implementations
         private readonly IOrderRepository _orderRepository;
         private readonly IVerificationService _verificationService;
         private readonly IDeliveryRepository _deliveryRepository;
+        private readonly IProductRepository _productRepository;
+        private readonly ISaleDataRepository _saleDataRepository;
 
         public OrdersService(
             IUserRepository userRepository,
             IOrderRepository orderRepository,
             IVerificationService verificationService,
-            IDeliveryRepository deliveryRepository)
+            IDeliveryRepository deliveryRepository,
+            IProductRepository productRepository,
+            ISaleDataRepository saleDataRepository)
         {
             _userRepository = userRepository;
             _orderRepository = orderRepository;
             _verificationService = verificationService;
             _deliveryRepository = deliveryRepository;
-
+            _productRepository = productRepository;
+            _saleDataRepository = saleDataRepository;
         }
 
         public Response GetDates(string adminEmail)
@@ -196,13 +201,36 @@ namespace ViandasDelSur.Services.Implementations
                     {
                         if (deliveryDTO.quantity != 0)
                         {
-                            Delivery delivery = new Delivery();
-                            delivery.orderId = order.Id;
-                            delivery.productId = deliveryDTO.productId;
-                            delivery.delivered = false;
-                            delivery.deliveryDate = DatesTool.GetNextWeekDay(deliveryDTO.deliveryDate);
-                            delivery.quantity = deliveryDTO.quantity;
-                            order.Deliveries.Add(delivery);
+                            var product = _productRepository.GetById(deliveryDTO.productId);
+
+                            if (product != null)
+                            {
+                                Delivery delivery = new Delivery();
+                                delivery.orderId = order.Id;
+                                delivery.productId = deliveryDTO.productId;
+                                delivery.delivered = false;
+                                delivery.deliveryDate = DatesTool.GetNextWeekDay(deliveryDTO.deliveryDate);
+                                delivery.quantity = deliveryDTO.quantity;
+                                order.Deliveries.Add(delivery);
+
+                                SaleData saleData = new SaleData();
+
+                                saleData.price = product.Menu.price;
+                                saleData.quantity = delivery.quantity;
+                                saleData.paymentMethod = modelOrder.paymentMethod;
+                                saleData.day = deliveryDTO.deliveryDate;
+                                saleData.productName = product.name;
+                                saleData.category = product.Menu.category;
+                                saleData.validDate = product.Menu.validDate;
+
+                                _saleDataRepository.Save(saleData);
+                            }
+                            else
+                            {
+                                response.statusCode = 400;
+                                response.message = "Error al realizar la orden";
+                                return response;
+                            }          
                         }
                     }
                     _orderRepository.Save(order);

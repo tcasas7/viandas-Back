@@ -1,17 +1,35 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 
 #nullable disable
 
 namespace ViandasDelSur.Migrations
 {
     /// <inheritdoc />
-    public partial class v1_FirstMigration : Migration
+    public partial class v1_wholeMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Contacts",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    cbu = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    alias = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    isActive = table.Column<bool>(type: "bit", nullable: false),
+                    wppMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    accountName = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Contacts", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Images",
                 columns: table => new
@@ -27,17 +45,37 @@ namespace ViandasDelSur.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Menu",
+                name: "Menus",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     category = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    validDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    validDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    price = table.Column<double>(type: "float", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Menu", x => x.Id);
+                    table.PrimaryKey("PK_Menus", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SaleData",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    productName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    validDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    day = table.Column<int>(type: "int", nullable: false),
+                    category = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    price = table.Column<double>(type: "float", nullable: false),
+                    quantity = table.Column<int>(type: "int", nullable: false),
+                    paymentMethod = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SaleData", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -68,20 +106,21 @@ namespace ViandasDelSur.Migrations
                     name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     day = table.Column<int>(type: "int", nullable: false),
                     menuId = table.Column<int>(type: "int", nullable: false),
-                    ImageId = table.Column<long>(type: "bigint", nullable: true)
+                    imageId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Products", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Products_Images_ImageId",
-                        column: x => x.ImageId,
+                        name: "FK_Products_Images_imageId",
+                        column: x => x.imageId,
                         principalTable: "Images",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Products_Menu_menuId",
+                        name: "FK_Products_Menus_menuId",
                         column: x => x.menuId,
-                        principalTable: "Menu",
+                        principalTable: "Menus",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -93,6 +132,7 @@ namespace ViandasDelSur.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     dir = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    isDefault = table.Column<bool>(type: "bit", nullable: false),
                     userId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -117,6 +157,7 @@ namespace ViandasDelSur.Migrations
                     hasSalt = table.Column<bool>(type: "bit", nullable: false),
                     description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     orderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    location = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     userId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -138,6 +179,7 @@ namespace ViandasDelSur.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     delivered = table.Column<bool>(type: "bit", nullable: false),
                     deliveryDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    quantity = table.Column<int>(type: "int", nullable: false),
                     orderId = table.Column<int>(type: "int", nullable: false),
                     productId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -179,9 +221,9 @@ namespace ViandasDelSur.Migrations
                 column: "userId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Products_ImageId",
+                name: "IX_Products_imageId",
                 table: "Products",
-                column: "ImageId");
+                column: "imageId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Products_menuId",
@@ -193,10 +235,16 @@ namespace ViandasDelSur.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Contacts");
+
+            migrationBuilder.DropTable(
                 name: "Delivery");
 
             migrationBuilder.DropTable(
                 name: "Locations");
+
+            migrationBuilder.DropTable(
+                name: "SaleData");
 
             migrationBuilder.DropTable(
                 name: "Orders");
@@ -211,7 +259,7 @@ namespace ViandasDelSur.Migrations
                 name: "Images");
 
             migrationBuilder.DropTable(
-                name: "Menu");
+                name: "Menus");
         }
     }
 }

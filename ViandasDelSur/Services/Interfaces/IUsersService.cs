@@ -12,7 +12,7 @@ namespace ViandasDelSur.Services.Interfaces
         public Response ChangeRole(ChangeRoleDTO model, string adminEmail);
         public Response ChangePhone(ChangePhoneDTO model, string email);
         public Response Data(string email);
-        public Response AddLocation(LocationDTO model, string email);
+        public Response AddLocation(LocationDTO model, string email); 
         public Response MakeDefault(LocationDTO model, string email);
         public Response RemoveLocation(LocationDTO model, string email);
         public Response GetAllContacts(string email);

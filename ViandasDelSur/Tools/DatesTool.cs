@@ -25,7 +25,6 @@
             else
                 daysUntilNextDay += 8;
 
-
             DateTime nextDay = today.AddDays(daysUntilNextDay);
 
             return nextDay;

@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
-using System;
 using System.Text;
 using ViandasDelSur.Models;
 using ViandasDelSur.Repositories.Implementations;
@@ -80,6 +79,7 @@ builder.Services.AddScoped<IMenuRepository, MenuRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IImageRepository, ImageRepository>();
 builder.Services.AddScoped<IContactRepository, ContactRepository>();
+builder.Services.AddScoped<ISaleDataRepository, SaleDataRepository>();
 
 //Adds services
 builder.Services.AddScoped<IAuthService, AuthService>();

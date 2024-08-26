@@ -12,8 +12,8 @@ using ViandasDelSur.Models;
 namespace ViandasDelSur.Migrations
 {
     [DbContext(typeof(VDSContext))]
-    [Migration("20240630043819_v7_addsCositas")]
-    partial class v7_addsCositas
+    [Migration("20240826141957_v1_wholeMigration")]
+    partial class v1_wholeMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,40 @@ namespace ViandasDelSur.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("ViandasDelSur.Models.Contact", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("accountName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("alias")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("cbu")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("isActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("phone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("wppMessage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Contacts");
+                });
 
             modelBuilder.Entity("ViandasDelSur.Models.Delivery", b =>
                 {
@@ -166,11 +200,11 @@ namespace ViandasDelSur.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<long?>("ImageId")
-                        .HasColumnType("bigint");
-
                     b.Property<int>("day")
                         .HasColumnType("int");
+
+                    b.Property<long>("imageId")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("menuId")
                         .HasColumnType("int");
@@ -180,11 +214,45 @@ namespace ViandasDelSur.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ImageId");
+                    b.HasIndex("imageId");
 
                     b.HasIndex("menuId");
 
                     b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("ViandasDelSur.Models.SaleData", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("category")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("day")
+                        .HasColumnType("int");
+
+                    b.Property<int>("paymentMethod")
+                        .HasColumnType("int");
+
+                    b.Property<double>("price")
+                        .HasColumnType("float");
+
+                    b.Property<string>("productName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("quantity")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("validDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SaleData");
                 });
 
             modelBuilder.Entity("ViandasDelSur.Models.User", b =>
@@ -266,7 +334,9 @@ namespace ViandasDelSur.Migrations
                 {
                     b.HasOne("ViandasDelSur.Models.Image", "Image")
                         .WithMany("Products")
-                        .HasForeignKey("ImageId");
+                        .HasForeignKey("imageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ViandasDelSur.Models.Menu", "Menu")
                         .WithMany("Products")

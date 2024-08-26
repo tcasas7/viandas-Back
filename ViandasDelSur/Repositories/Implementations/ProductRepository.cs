@@ -19,6 +19,7 @@ namespace ViandasDelSur.Repositories.Implementations
         {
             return FindByCondition(p => p.Id == id)
                 .Include(p => p.Image)
+                .Include(p => p.Menu)
                 .FirstOrDefault();
         }
 
