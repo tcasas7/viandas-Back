@@ -161,7 +161,107 @@ namespace ViandasDelSur.Services.Implementations
             return response;
         }
 
+
         public Response Place(string email, ICollection<OrderDTO> model)
+        {
+            Response response = new Response();
+
+            var user = _userRepository.FindByEmail(email);
+
+            if (user == null)
+            {
+                response.statusCode = 404;
+                response.message = "Usuario no encontrado";
+                return response;
+            }
+
+            if (model == null)
+            {
+                response.statusCode = 400;
+                response.message = "Error";
+                return response;
+            }
+
+            foreach (var modelOrder in model)
+            {
+                if (modelOrder.price != 0)
+                {
+                    Order order = new Order();
+
+                    order.Id = modelOrder.Id;
+                    order.price = modelOrder.price;
+                    order.paymentMethod = modelOrder.paymentMethod;
+                    order.hasSalt = modelOrder.hasSalt;
+                    order.orderDate = modelOrder.orderDate;
+                    order.Deliveries = new List<Delivery>();
+                    order.userId = user.Id;
+                    order.location = modelOrder.location;
+                    order.description = modelOrder.description;
+
+                    foreach (var deliveryDTO in modelOrder.deliveries)
+                    {
+                        if (deliveryDTO.quantity != 0)
+                        {
+                            var product = _productRepository.GetById(deliveryDTO.productId);
+
+                            if (product != null)
+                            {
+                                Delivery delivery = new Delivery();
+                                delivery.orderId = order.Id;
+                                delivery.productId = deliveryDTO.productId;
+                                delivery.delivered = false;
+
+                                // Conversión de número (1-5) a DayOfWeek
+                                DayOfWeek dayOfWeek = deliveryDTO.deliveryDate switch
+                                {
+                                    1 => DayOfWeek.Monday,
+                                    2 => DayOfWeek.Tuesday,
+                                    3 => DayOfWeek.Wednesday,
+                                    4 => DayOfWeek.Thursday,
+                                    5 => DayOfWeek.Friday,
+                                    _ => throw new Exception("Día inválido")
+                                };
+
+                                // Asignar el día convertido
+                                delivery.deliveryDate = DatesTool.GetNextWeekDay(dayOfWeek);
+
+                                delivery.quantity = deliveryDTO.quantity;
+                                order.Deliveries.Add(delivery);
+
+                                // Guardar la venta
+                                SaleData saleData = new SaleData();
+                                saleData.price = product.Menu.price;
+                                saleData.quantity = delivery.quantity;
+                                saleData.paymentMethod = modelOrder.paymentMethod;
+                                saleData.day = (DayOfWeek)(deliveryDTO.deliveryDate % 7); // Convertimos el número de día al tipo DayOfWeek
+                                saleData.productName = product.name;
+                                saleData.category = product.Menu.category;
+                                saleData.validDate = product.Menu.validDate;
+
+                                _saleDataRepository.Save(saleData);
+                            }
+                            else
+                            {
+                                response.statusCode = 400;
+                                response.message = "Error al realizar la orden";
+                                return response;
+                            }
+                        }
+                    }
+                    _orderRepository.Save(order);
+                }
+            }
+
+            response.statusCode = 200;
+            response.message = "Ok";
+            return response;
+        }
+
+
+
+
+
+        /*public Response Place(string email, ICollection<OrderDTO> model)
         {
             Response response = new Response();
 
@@ -240,7 +340,7 @@ namespace ViandasDelSur.Services.Implementations
             response.statusCode = 200;
             response.message = "Ok";
             return response;
-        }
+        }*/
 
         public Response Remove(string email, int orderId)
         {

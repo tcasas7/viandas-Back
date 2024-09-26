@@ -6,7 +6,7 @@ namespace ViandasDelSur.Models
     {
         public int Id { get; set; }
         public string name { get; set; }
-        public DayOfWeek day { get; set; }
+        public DayOfWeek day { get; set; }  // Aquí usamos DayOfWeek
 
         public ICollection<Delivery> Deliveries { get; set; }
 
@@ -21,7 +21,7 @@ namespace ViandasDelSur.Models
         public Product(ProductDTO productDTO)
         {
             name = productDTO.name;
-            day = productDTO.day;
+            day = (DayOfWeek)(productDTO.day - 1);  // Conversión explícita de int a DayOfWeek
 
             Deliveries = new List<Delivery>();
         }
@@ -30,11 +30,11 @@ namespace ViandasDelSur.Models
         {
             Id = productDTO.Id;
             name = productDTO.name;
-            day = productDTO.day;
+            day = (DayOfWeek)(productDTO.day - 1);  // Conversión explícita de int a DayOfWeek
 
             Image = img;
-
             Deliveries = new List<Delivery>();
         }
     }
 }
+
