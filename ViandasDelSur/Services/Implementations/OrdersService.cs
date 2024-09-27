@@ -186,17 +186,18 @@ namespace ViandasDelSur.Services.Implementations
             {
                 if (modelOrder.price != 0)
                 {
-                    Order order = new Order();
-
-                    order.Id = modelOrder.Id;
-                    order.price = modelOrder.price;
-                    order.paymentMethod = modelOrder.paymentMethod;
-                    order.hasSalt = modelOrder.hasSalt;
-                    order.orderDate = modelOrder.orderDate;
-                    order.Deliveries = new List<Delivery>();
-                    order.userId = user.Id;
-                    order.location = modelOrder.location;
-                    order.description = modelOrder.description;
+                    Order order = new Order
+                    {
+                        Id = modelOrder.Id,
+                        price = modelOrder.price,
+                        paymentMethod = modelOrder.paymentMethod,
+                        hasSalt = modelOrder.hasSalt,
+                        orderDate = modelOrder.orderDate,
+                        userId = user.Id,
+                        location = modelOrder.location,
+                        description = modelOrder.description,
+                        Deliveries = new List<Delivery>()
+                    };
 
                     foreach (var deliveryDTO in modelOrder.deliveries)
                     {
@@ -206,48 +207,39 @@ namespace ViandasDelSur.Services.Implementations
 
                             if (product != null)
                             {
-                                Delivery delivery = new Delivery();
-                                delivery.orderId = order.Id;
-                                delivery.productId = deliveryDTO.productId;
-                                delivery.delivered = false;
-
-                                // Conversión de número (1-5) a DayOfWeek
-                                DayOfWeek dayOfWeek = deliveryDTO.deliveryDate switch
+                                Delivery delivery = new Delivery
                                 {
-                                    1 => DayOfWeek.Monday,
-                                    2 => DayOfWeek.Tuesday,
-                                    3 => DayOfWeek.Wednesday,
-                                    4 => DayOfWeek.Thursday,
-                                    5 => DayOfWeek.Friday,
-                                    _ => throw new Exception("Día inválido")
+                                    orderId = order.Id,
+                                    productId = deliveryDTO.productId,
+                                    delivered = false,
+                                    deliveryDate = DatesTool.GetNextWeekDay(deliveryDTO.deliveryDate),  // No necesitamos cambiar el tipo de dato aquí
+                                    quantity = deliveryDTO.quantity
                                 };
 
-                                // Asignar el día convertido
-                                delivery.deliveryDate = DatesTool.GetNextWeekDay(dayOfWeek);
-
-                                delivery.quantity = deliveryDTO.quantity;
                                 order.Deliveries.Add(delivery);
 
-                                // Guardar la venta
-                                SaleData saleData = new SaleData();
-                                saleData.price = product.Menu.price;
-                                saleData.quantity = delivery.quantity;
-                                saleData.paymentMethod = modelOrder.paymentMethod;
-                                saleData.day = (DayOfWeek)(deliveryDTO.deliveryDate % 7); // Convertimos el número de día al tipo DayOfWeek
-                                saleData.productName = product.name;
-                                saleData.category = product.Menu.category;
-                                saleData.validDate = product.Menu.validDate;
+                                SaleData saleData = new SaleData
+                                {
+                                    price = product.Menu.price,
+                                    quantity = delivery.quantity,
+                                    paymentMethod = modelOrder.paymentMethod,
+                                    day = deliveryDTO.deliveryDate,  // Usamos directamente el número del día (1-5)
+                                    productName = product.name,
+                                    category = product.Menu.category,
+                                    validDate = product.Menu.validDate
+                                };
 
                                 _saleDataRepository.Save(saleData);
                             }
                             else
                             {
                                 response.statusCode = 400;
-                                response.message = "Error al realizar la orden";
+                                response.message = "Error al realizar la orden: Producto no encontrado";
                                 return response;
                             }
                         }
                     }
+
                     _orderRepository.Save(order);
                 }
             }
@@ -260,87 +252,7 @@ namespace ViandasDelSur.Services.Implementations
 
 
 
-
-        /*public Response Place(string email, ICollection<OrderDTO> model)
-        {
-            Response response = new Response();
-
-            var user = _userRepository.FindByEmail(email);
-
-            if (user == null)
-            {
-                response.statusCode = 404;
-                response.message = "Usuario no encontrado";
-                return response;
-            }
-
-            if(model == null)
-            {
-                response.statusCode = 400;
-                response.message = "Error";
-                return response;
-            }
-
-            foreach (var modelOrder in model)
-            {
-                if(modelOrder.price != 0)
-                {
-                    Order order = new Order();
-
-                    order.Id = modelOrder.Id;
-                    order.price = modelOrder.price;
-                    order.paymentMethod = modelOrder.paymentMethod;
-                    order.hasSalt = modelOrder.hasSalt;
-                    order.orderDate = modelOrder.orderDate;
-                    order.Deliveries = new List<Delivery>();
-                    order.userId = user.Id;
-                    order.location = modelOrder.location;
-                    order.description = modelOrder.description;
-
-                    foreach (var deliveryDTO in modelOrder.deliveries)
-                    {
-                        if (deliveryDTO.quantity != 0)
-                        {
-                            var product = _productRepository.GetById(deliveryDTO.productId);
-
-                            if (product != null)
-                            {
-                                Delivery delivery = new Delivery();
-                                delivery.orderId = order.Id;
-                                delivery.productId = deliveryDTO.productId;
-                                delivery.delivered = false;
-                                delivery.deliveryDate = DatesTool.GetNextWeekDay(deliveryDTO.deliveryDate);
-                                delivery.quantity = deliveryDTO.quantity;
-                                order.Deliveries.Add(delivery);
-
-                                SaleData saleData = new SaleData();
-
-                                saleData.price = product.Menu.price;
-                                saleData.quantity = delivery.quantity;
-                                saleData.paymentMethod = modelOrder.paymentMethod;
-                                saleData.day = deliveryDTO.deliveryDate;
-                                saleData.productName = product.name;
-                                saleData.category = product.Menu.category;
-                                saleData.validDate = product.Menu.validDate;
-
-                                _saleDataRepository.Save(saleData);
-                            }
-                            else
-                            {
-                                response.statusCode = 400;
-                                response.message = "Error al realizar la orden";
-                                return response;
-                            }          
-                        }
-                    }
-                    _orderRepository.Save(order);
-                }
-            }
-
-            response.statusCode = 200;
-            response.message = "Ok";
-            return response;
-        }*/
+      
 
         public Response Remove(string email, int orderId)
         {

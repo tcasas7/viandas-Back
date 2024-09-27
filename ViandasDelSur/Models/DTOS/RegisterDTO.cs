@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-namespace ViandasDelSur.Models.DTOS
+﻿namespace ViandasDelSur.Models.DTOS
 {
     public class RegisterDTO
     {
