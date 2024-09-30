@@ -11,6 +11,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Media\BrochetteDeCerdo.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Media\BrochetteDeCerdo.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.6" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.6" />

@@ -64,7 +64,6 @@ namespace ViandasDelSur.Controllers
                 return new JsonResult(response);
             }
         }
-
         [HttpGet("image/{id}")]
         public ActionResult<AnyType> ImageByProductId(int id)
         {
@@ -74,23 +73,25 @@ namespace ViandasDelSur.Controllers
 
                 if (product == null)
                 {
-                    return StatusCode(404, "No encontrado");
+                    return StatusCode(404, "Producto no encontrado");
                 }
 
-                byte[] result = _imageTool.GetImageFromPath(product.Image.route, "");
+                string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "Media", product.Image.name);
 
-                if (result == null)
+                if (!System.IO.File.Exists(imagePath))
+                {
                     return StatusCode(404, "Imagen no encontrada");
+                }
 
-                var file = File(result, "image/png");
-
-                return file;
+                byte[] result = System.IO.File.ReadAllBytes(imagePath);
+                return File(result, "image/png");
             }
             catch (Exception e)
             {
                 return StatusCode(500, e.Message);
             }
         }
+
 
         [Authorize]
         [HttpPost("changeImage/{id}")]

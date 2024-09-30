@@ -1,4 +1,5 @@
 ﻿using ViandasDelSur.Models.DTOS;
+using ViandasDelSur.Repositories.Interfaces;
 
 namespace ViandasDelSur.Models
 {
@@ -11,9 +12,9 @@ namespace ViandasDelSur.Models
 
         public ICollection<Product> Products { get; set; }
 
-        public Menu(){}
+        public Menu() { }
 
-        public Menu(MenuDTO menuDTO, Image image)
+        public Menu(MenuDTO menuDTO, IImageRepository imageRepository)
         {
             Id = menuDTO.Id;
             category = menuDTO.category;
@@ -23,19 +24,30 @@ namespace ViandasDelSur.Models
 
             foreach (var productDTO in menuDTO.products)
             {
-                Product product = new Product(productDTO);
-                product.Image = image;
-                Products.Add(product);
-            }
-        }
+                // Obtener la imagen del repositorio usando el imageId del productDTO
+                var image = imageRepository.GetById(productDTO.imageId);
 
-        public Menu(MenuDTO menuDTO)
-        {
-            Id = menuDTO.Id;
-            category = menuDTO.category;
-            validDate = menuDTO.validDate;
-            price = menuDTO.price;
-            Products = new List<Product>();
+                if (image != null)
+                {
+                    Products.Add(new Product(productDTO, image));
+                }
+                else
+                {
+                    // Si no se encuentra la imagen, se puede usar una imagen predeterminada
+                    var defaultImage = imageRepository.GetByName("Default");
+                    if (defaultImage != null)
+                    {
+                        Products.Add(new Product(productDTO, defaultImage));
+                    }
+                    else
+                    {
+                        throw new Exception("No se encontró una imagen para el producto con Id " + productDTO.Id);
+                    }
+                }
+            }
         }
     }
 }
+
+
+

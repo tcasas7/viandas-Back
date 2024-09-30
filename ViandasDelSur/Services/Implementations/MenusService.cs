@@ -57,7 +57,93 @@ namespace ViandasDelSur.Services.Implementations
             return response;
         }
 
+
         public Response Add(string email, AddMenusDTO model)
+        {
+            Response response = new Response();
+
+            var user = _userRepository.FindByEmail(email);
+
+            if (user == null)
+            {
+                response.statusCode = 401;
+                response.message = "Sesión invalida";
+                return response;
+            }
+
+            response = _verificationService.VerifyAdmin(user);
+
+            if (response.statusCode != 200)
+                return response;
+
+            var oldMenus = _menuRepository.GetAll();
+
+            if (oldMenus == null)
+            {
+                response.statusCode = 404;
+                response.message = "Elementos no encontrados";
+                return response;
+            }
+
+            // Remover los menús antiguos
+            foreach (var menu in oldMenus)
+            {
+                _menuRepository.Remove(menu);
+            }
+
+            foreach (var menuDTO in model.Menus)
+            {
+                // Aquí se asegura de tener acceso al repositorio de imágenes para obtenerlas
+                Menu menu = new Menu(menuDTO, _imageRepository);
+                menu.validDate = DatesTool.GetNextDay(DayOfWeek.Monday);
+                _menuRepository.Save(menu);
+            }
+
+
+            var newMenus = _menuRepository.GetAll();
+
+            if (newMenus == null)
+            {
+                response.statusCode = 404;
+                response.message = "Elementos no encontrados";
+                return response;
+            }
+            foreach (var menu in newMenus)
+            {
+                foreach (var menuDTO in model.Menus)
+                {
+                    if (menu.category == menuDTO.category)
+                    {
+                        foreach (var productDTO in menuDTO.products)
+                        {
+                            // Obtener la imagen del repositorio para este producto
+                            var image = _imageRepository.GetById(productDTO.imageId);
+
+                            if (image != null)
+                            {
+                                Product product = new Product(productDTO, image);
+                                product.menuId = menu.Id;
+                                _productRepository.Save(product);
+                            }
+                            else
+                            {
+                                response.statusCode = 400;
+                                response.message = $"No se encontró una imagen para el producto con ID: {productDTO.Id}";
+                                return response;
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            response.statusCode = 200;
+            response.message = "Ok";
+
+            return response;
+        }
+
+        /*public Response Add(string email, AddMenusDTO model)
         {
             Response response = new Response();
 
@@ -134,7 +220,7 @@ namespace ViandasDelSur.Services.Implementations
             response.message = "Ok";
 
             return response;
-        }
+        }*/
 
         public Response ChangeImage(IFormFile model, int productId)
         {
