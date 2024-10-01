@@ -73,18 +73,21 @@ namespace ViandasDelSur.Controllers
 
                 if (product == null)
                 {
-                    return StatusCode(404, "Producto no encontrado");
+                    return StatusCode(404, "No encontrado");
                 }
 
-                string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "Media", product.Image.name);
+                // Usa 'route' para obtener la ubicación correcta de la imagen
+                string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "Media", product.Image.route);
+                //Console.WriteLine($"Buscando imagen en: {imagePath}");
 
-                if (!System.IO.File.Exists(imagePath))
-                {
+                byte[] result = _imageTool.GetImageFromPath(imagePath, "");
+
+                if (result == null)
                     return StatusCode(404, "Imagen no encontrada");
-                }
 
-                byte[] result = System.IO.File.ReadAllBytes(imagePath);
-                return File(result, "image/png");
+                var file = File(result, "image/png");
+
+                return file;
             }
             catch (Exception e)
             {
