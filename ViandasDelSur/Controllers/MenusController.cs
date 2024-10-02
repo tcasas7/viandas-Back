@@ -65,7 +65,7 @@ namespace ViandasDelSur.Controllers
             }
         }
         [HttpGet("image/{id}")]
-        public ActionResult<AnyType> ImageByProductId(int id)
+        public ActionResult ImageByProductId(int id)
         {
             try
             {
@@ -76,25 +76,27 @@ namespace ViandasDelSur.Controllers
                     return StatusCode(404, "No encontrado");
                 }
 
-                // Usa 'route' para obtener la ubicación correcta de la imagen
+                // Asegúrate de que 'product.Image.route' contiene solo el nombre de la imagen, no "Media/nombreImagen.jpg"
                 string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "Media", product.Image.route);
-                //Console.WriteLine($"Buscando imagen en: {imagePath}");
+                //string imagePath = "D:\\Escritorio\\viandas-Back\\ViandasDelSur\\Media\\" + product.Image.route;
+                Console.WriteLine("Ruta de la imagen: " + imagePath);
+
+
 
                 byte[] result = _imageTool.GetImageFromPath(imagePath, "");
 
                 if (result == null)
+                {
                     return StatusCode(404, "Imagen no encontrada");
+                }
 
-                var file = File(result, "image/png");
-
-                return file;
+                return File(result, "image/png");
             }
             catch (Exception e)
             {
                 return StatusCode(500, e.Message);
             }
         }
-
 
         [Authorize]
         [HttpPost("changeImage/{id}")]
