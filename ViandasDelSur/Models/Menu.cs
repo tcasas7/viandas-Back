@@ -8,7 +8,8 @@ namespace ViandasDelSur.Models
         public int Id { get; set; }
         public string category { get; set; }
         public DateTime validDate { get; set; }
-        public double price { get; set; }
+        public decimal price { get; set; }
+        public bool IsDeleted { get; set; } = false;
 
         public ICollection<Product> Products { get; set; }
 

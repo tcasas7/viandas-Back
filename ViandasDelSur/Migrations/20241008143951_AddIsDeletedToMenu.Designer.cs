@@ -12,8 +12,8 @@ using ViandasDelSur.Models;
 namespace ViandasDelSur.Migrations
 {
     [DbContext(typeof(VDSContext))]
-    [Migration("20240826141957_v1_wholeMigration")]
-    partial class v1_wholeMigration
+    [Migration("20241008143951_AddIsDeletedToMenu")]
+    partial class AddIsDeletedToMenu
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,38 @@ namespace ViandasDelSur.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Product", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("day")
+                        .HasColumnType("int");
+
+                    b.Property<long>("imageId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("menuId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("imageId");
+
+                    b.HasIndex("menuId");
+
+                    b.ToTable("Products");
+                });
 
             modelBuilder.Entity("ViandasDelSur.Models.Contact", b =>
                 {
@@ -142,10 +174,13 @@ namespace ViandasDelSur.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("category")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("price")
+                    b.Property<decimal>("price")
                         .HasColumnType("float");
 
                     b.Property<DateTime>("validDate")
@@ -179,7 +214,7 @@ namespace ViandasDelSur.Migrations
                     b.Property<int>("paymentMethod")
                         .HasColumnType("int");
 
-                    b.Property<double>("price")
+                    b.Property<decimal>("price")
                         .HasColumnType("float");
 
                     b.Property<int>("userId")
@@ -190,35 +225,6 @@ namespace ViandasDelSur.Migrations
                     b.HasIndex("userId");
 
                     b.ToTable("Orders");
-                });
-
-            modelBuilder.Entity("ViandasDelSur.Models.Product", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("day")
-                        .HasColumnType("int");
-
-                    b.Property<long>("imageId")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("menuId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("imageId");
-
-                    b.HasIndex("menuId");
-
-                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("ViandasDelSur.Models.SaleData", b =>
@@ -238,7 +244,7 @@ namespace ViandasDelSur.Migrations
                     b.Property<int>("paymentMethod")
                         .HasColumnType("int");
 
-                    b.Property<double>("price")
+                    b.Property<decimal>("price")
                         .HasColumnType("float");
 
                     b.Property<string>("productName")
@@ -289,6 +295,25 @@ namespace ViandasDelSur.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Product", b =>
+                {
+                    b.HasOne("ViandasDelSur.Models.Image", "Image")
+                        .WithMany("Products")
+                        .HasForeignKey("imageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ViandasDelSur.Models.Menu", "Menu")
+                        .WithMany("Products")
+                        .HasForeignKey("menuId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Image");
+
+                    b.Navigation("Menu");
+                });
+
             modelBuilder.Entity("ViandasDelSur.Models.Delivery", b =>
                 {
                     b.HasOne("ViandasDelSur.Models.Order", "Order")
@@ -297,7 +322,7 @@ namespace ViandasDelSur.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ViandasDelSur.Models.Product", "Product")
+                    b.HasOne("Product", "Product")
                         .WithMany("Deliveries")
                         .HasForeignKey("productId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -330,23 +355,9 @@ namespace ViandasDelSur.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ViandasDelSur.Models.Product", b =>
+            modelBuilder.Entity("Product", b =>
                 {
-                    b.HasOne("ViandasDelSur.Models.Image", "Image")
-                        .WithMany("Products")
-                        .HasForeignKey("imageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ViandasDelSur.Models.Menu", "Menu")
-                        .WithMany("Products")
-                        .HasForeignKey("menuId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Image");
-
-                    b.Navigation("Menu");
+                    b.Navigation("Deliveries");
                 });
 
             modelBuilder.Entity("ViandasDelSur.Models.Image", b =>
@@ -360,11 +371,6 @@ namespace ViandasDelSur.Migrations
                 });
 
             modelBuilder.Entity("ViandasDelSur.Models.Order", b =>
-                {
-                    b.Navigation("Deliveries");
-                });
-
-            modelBuilder.Entity("ViandasDelSur.Models.Product", b =>
                 {
                     b.Navigation("Deliveries");
                 });

@@ -9,7 +9,7 @@ namespace ViandasDelSur.Models
         public DateTime validDate { get; set; }
         public DayOfWeek day { get; set; }
         public string category { get; set; }
-        public double price { get; set; }
+        public decimal price { get; set; }
         public int quantity { get; set; }
         public PaymentMethod paymentMethod { get; set; }
     }

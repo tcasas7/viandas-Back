@@ -4,10 +4,11 @@ namespace ViandasDelSur.Repositories.Interfaces
 {
     public interface IImageRepository
     {
-        void Save(Image image);
         Image GetById(long id);
-        Image GetByName(string name);
+        void Save(Image image); // Aseguramos que el método Save esté definido
         void Remove(Image image);
-        ICollection<Image> GetAll();
+        Image GetByName(string name); // Aseguramos que GetByName esté definido
+        ICollection<Image> GetAll();  // Aseguramos que GetAll esté definido
+        void Update(Image image); // Aseguramos que Update esté definido
     }
 }

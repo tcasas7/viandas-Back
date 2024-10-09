@@ -5,7 +5,7 @@
         public int Id { get; set; }
         public string category { get; set; }
         public DateTime validDate { get; set; }
-        public double price { get; set; }
+        public decimal price { get; set; }
 
         public List<ProductDTO> products { get; set; } = new List<ProductDTO>();
 

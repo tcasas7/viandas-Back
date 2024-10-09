@@ -11,7 +11,23 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Media\08ecdf3e-1359-482a-ab01-3a50c2082242.jpg" />
+    <None Remove="Media\1108ecb8-7ae2-45e7-9771-e001404e1384.jpg" />
+    <None Remove="Media\31e9fef8-c398-4b2f-95b1-0e063c00cf59.jpg" />
+    <None Remove="Media\3810faa6-e153-437d-a220-85d5d6c63f52.webp" />
+    <None Remove="Media\58b32598-6558-4d52-b01e-8dee459b65bc.jpg" />
+    <None Remove="Media\6ea6e16a-26e4-40ce-a042-bb63f9558597.webp" />
+    <None Remove="Media\71ebf913-09a1-482e-b218-702f05571629.jpg" />
+    <None Remove="Media\81b2f166-8663-43d6-8d91-b0a3db2a150b.jpg" />
+    <None Remove="Media\843abfb0-c4c9-4f81-9a9c-6ff213da85ec.jpg" />
+    <None Remove="Media\8ae35dde-5040-43b1-bdaa-05480654522f.webp" />
+    <None Remove="Media\aa418557-8dd2-4894-8d65-cc43f5d9c84c.webp" />
+    <None Remove="Media\ad00e793-2c4f-43f2-ad76-9ff871c75c90.jpg" />
     <None Remove="Media\BrochetteDeCerdo.jpg" />
+    <None Remove="Media\cd52db25-d09b-4e57-8d83-a1385987fb76.jpg" />
+    <None Remove="Media\d7a8bddd-5b9c-42f8-ba04-eeecf1ad7c22.jpg" />
+    <None Remove="Media\e0b8280d-e985-44db-aac1-64e9447ea70a.jpg" />
+    <None Remove="Media\e52b61b2-b2a4-4116-af3f-a5c431047bc6.jpg" />
   </ItemGroup>
 
   <ItemGroup>

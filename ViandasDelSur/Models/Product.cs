@@ -10,6 +10,7 @@ public class Product
     public Menu Menu { get; set; }
     public Image Image { get; set; }
     public long imageId { get; set; }
+    public decimal price { get; set; }
 
     public Product() { }
 
@@ -20,6 +21,7 @@ public class Product
         day = productDTO.day;  // No necesitamos conversiones
         Image = img;
         Deliveries = new List<Delivery>();
+        price = productDTO.price;
     }
 }
 

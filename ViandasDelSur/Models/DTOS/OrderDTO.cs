@@ -5,7 +5,7 @@ namespace ViandasDelSur.Models.DTOS
     public class OrderDTO
     {
         public int Id { get; set; }
-        public double price { get; set; }
+        public decimal price { get; set; }
         public PaymentMethod paymentMethod { get; set; }
         public bool hasSalt { get; set; }
         public string description { get; set; }
