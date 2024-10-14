@@ -196,12 +196,15 @@ namespace ViandasDelSur.Services.Implementations
                 return response;
             }
 
+            // Asegurarse de que 'user' tiene todas las propiedades necesarias
             UserDTO userDTO = new UserDTO(user);
 
+            // Devolver el UserDTO dentro de un ResponseModel
             response = new ResponseModel<UserDTO>(200, "Ok", userDTO);
 
             return response;
         }
+
 
         public Response AddLocation(LocationDTO model, string email)
         {
