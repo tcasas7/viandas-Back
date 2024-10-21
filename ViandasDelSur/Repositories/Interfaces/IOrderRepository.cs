@@ -9,5 +9,6 @@ namespace ViandasDelSur.Repositories.Interfaces
         void Save(Order order);
         Order GetById(int id);
         void Remove(Order order);
+        List<Product> GetProductsByOrderId(int orderId);
     }
 }

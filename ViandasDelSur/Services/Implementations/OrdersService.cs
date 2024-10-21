@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using ViandasDelSur.Models;
 using ViandasDelSur.Models.DTOS;
 using ViandasDelSur.Models.Responses;
@@ -10,6 +11,7 @@ namespace ViandasDelSur.Services.Implementations
 {
     public class OrdersService : IOrdersService
     {
+        private readonly VDSContext _dbContext;
         private readonly IUserRepository _userRepository;
         private readonly IOrderRepository _orderRepository;
         private readonly IVerificationService _verificationService;
@@ -18,6 +20,7 @@ namespace ViandasDelSur.Services.Implementations
         private readonly ISaleDataRepository _saleDataRepository;
 
         public OrdersService(
+            VDSContext dbContext,
             IUserRepository userRepository,
             IOrderRepository orderRepository,
             IVerificationService verificationService,
@@ -25,6 +28,7 @@ namespace ViandasDelSur.Services.Implementations
             IProductRepository productRepository,
             ISaleDataRepository saleDataRepository)
         {
+            _dbContext = dbContext;
             _userRepository = userRepository;
             _orderRepository = orderRepository;
             _verificationService = verificationService;
@@ -146,7 +150,7 @@ namespace ViandasDelSur.Services.Implementations
             {
                 List<Delivery> del = _deliveryRepository.GetByOrder(order.Id).ToList();
                 order.Deliveries = del;
-            }   
+            }
 
             List<OrderDTO> result = new List<OrderDTO>();
 
@@ -250,44 +254,93 @@ namespace ViandasDelSur.Services.Implementations
         }
 
 
-
-
-      
-
         public Response Remove(string email, int orderId)
         {
             Response response = new Response();
 
-            var user = _userRepository.FindByEmail(email);
-
-            if (user == null)
+            try
             {
-                response.statusCode = 401;
-                response.message = "Sesión invalida";
-                return response;
+                // Obtener el usuario actual por email
+                var user = _userRepository.FindByEmail(email);
+
+                if (user == null)
+                {
+                    response.statusCode = 401;
+                    response.message = "Sesión inválida.";
+                    return response;
+                }
+
+                // Buscar la orden por ID
+                var order = _orderRepository.GetById(orderId);
+
+                if (order == null)
+                {
+                    response.statusCode = 404;
+                    response.message = "Orden no encontrada.";
+                    return response;
+                }
+
+                // Verificar si la orden pertenece al usuario actual
+                if (order.userId != user.Id)
+                {
+                    response.statusCode = 403;
+                    response.message = "No tienes permisos para cancelar esta orden.";
+                    return response;
+                }
+
+                // Eliminar la orden
+                _orderRepository.Remove(order);
+
+                // Guardar los cambios en la base de datos
+                _dbContext.SaveChanges();
+
+                response.statusCode = 200;
+                response.message = "Orden cancelada con éxito.";
+            }
+            catch (Exception ex)
+            {
+                response.statusCode = 500;
+                response.message = $"Error al cancelar la orden: {ex.Message}";
             }
 
-            var order = _orderRepository.GetById(orderId);
-
-            if (order == null)
-            {
-                response.statusCode = 404;
-                response.message = "Orden no encontrada";
-                return response;
-            }
-
-            if (order.userId != user.Id)
-            {
-                response.statusCode = 403;
-                response.message = "Sesión invalida";
-                return response;
-            }
-
-            _orderRepository.Remove(order);
-
-            response.statusCode = 200;
-            response.message = "Ok";
             return response;
         }
+
+        public List<Product> GetProductsByOrderId(int orderId)
+        {
+            return _orderRepository.GetProductsByOrderId(orderId);
+        }
+
+
+
+        public Response GetOrderProducts(int orderId)
+        {
+            Response response = new Response();
+
+            try
+            {
+                var order = _orderRepository.GetById(orderId);
+                if (order == null)
+                {
+                    response.statusCode = 404;
+                    response.message = "Orden no encontrada";
+                    return response;
+                }
+
+                var products = _orderRepository.GetProductsByOrderId(orderId); // Asegúrate de que el repositorio tenga este método implementado
+                response.statusCode = 200;
+                response.message = "Productos obtenidos exitosamente";
+                response.data = products; // Usar 'response.data' para devolver los productos en el objeto de respuesta
+            }
+            catch (Exception ex)
+            {
+                response.statusCode = 500;
+                response.message = ex.Message;
+            }
+
+            return response;
+        }
+
+
     }
 }

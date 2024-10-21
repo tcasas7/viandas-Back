@@ -9,9 +9,10 @@ namespace ViandasDelSur.Models
         public string cbu { get; set; }
         public string alias { get; set; }
         public string name { get; set; }
-        public bool isActive { get; set; }
+        public bool IsActive { get; set; }
         public string wppMessage { get; set; }
         public string accountName { get; set; }
+       
         public Contact()
         {
 
@@ -23,9 +24,10 @@ namespace ViandasDelSur.Models
             cbu = contactDTO.cbu;
             alias = contactDTO.alias;
             name = contactDTO.name;
-            isActive = contactDTO.isActive;
+            IsActive = contactDTO.IsActive;
             wppMessage = contactDTO.wppMessage;
             accountName = contactDTO.accountName;
+            
         }
     }
 }

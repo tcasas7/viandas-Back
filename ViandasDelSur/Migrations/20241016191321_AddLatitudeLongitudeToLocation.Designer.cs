@@ -12,8 +12,8 @@ using ViandasDelSur.Models;
 namespace ViandasDelSur.Migrations
 {
     [DbContext(typeof(VDSContext))]
-    [Migration("20241009124348_UpdatePricesToDecimal")]
-    partial class UpdatePricesToDecimal
+    [Migration("20241016191321_AddLatitudeLongitudeToLocation")]
+    partial class AddLatitudeLongitudeToLocation
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -149,6 +149,12 @@ namespace ViandasDelSur.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<double>("Latitude")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Longitude")
+                        .HasColumnType("float");
 
                     b.Property<string>("dir")
                         .HasColumnType("nvarchar(max)");

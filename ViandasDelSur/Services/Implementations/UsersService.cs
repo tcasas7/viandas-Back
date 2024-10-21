@@ -206,7 +206,7 @@ namespace ViandasDelSur.Services.Implementations
         }
 
 
-        public Response AddLocation(LocationDTO model, string email)
+        public async Task<Response> AddLocation(LocationDTO model, string email)
         {
             Response response = new Response();
 
@@ -219,11 +219,17 @@ namespace ViandasDelSur.Services.Implementations
                 return response;
             }
 
-            Location newLocation = new Location();
+            // Llamada a la API de Google para obtener coordenadas (latitud y longitud)
+            var coordinates = await GetCoordinatesFromGoogleMaps(model.dir);
 
-            newLocation.Id = model.Id;
-            newLocation.dir = model.dir;
-            newLocation.userId = user.Id;
+            Location newLocation = new Location
+            {
+                Id = model.Id,
+                dir = model.dir,
+                userId = user.Id,
+                Latitude = coordinates.Latitude,
+                Longitude = coordinates.Longitude // Asignamos las coordenadas obtenidas
+            };
 
             _locationRepository.Save(newLocation);
 
@@ -232,6 +238,22 @@ namespace ViandasDelSur.Services.Implementations
 
             return response;
         }
+
+        // Método para llamar a la API de Google Maps y obtener latitud y longitud
+        private async Task<(double Latitude, double Longitude)> GetCoordinatesFromGoogleMaps(string address)
+        {
+            var client = new HttpClient();
+            string url = $"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key=TU_API_KEY";
+            var response = await client.GetStringAsync(url);
+
+            // Procesar la respuesta JSON y obtener latitud y longitud
+            dynamic jsonResponse = Newtonsoft.Json.JsonConvert.DeserializeObject(response);
+            var lat = (double)jsonResponse.results[0].geometry.location.lat;
+            var lng = (double)jsonResponse.results[0].geometry.location.lng;
+
+            return (lat, lng);
+        }
+
 
         public Response MakeDefault(LocationDTO model, string email)
         {
@@ -374,39 +396,53 @@ namespace ViandasDelSur.Services.Implementations
         }
         public Response AddContact(ContactDTO model, string email)
         {
-            Response response = new Response();
+            var response = new Response();
 
-            var user = _userRepository.FindByEmail(email);
-
-            if (user == null)
+            try
             {
-                response.statusCode = 401;
-                response.message = "Sesión invalida";
-                return response;
+                // Verificar si el usuario existe
+                var user = _userRepository.FindByEmail(email);
+                if (user == null)
+                {
+                    response.statusCode = 401;
+                    response.message = "Sesión inválida";
+                    return response;
+                }
+
+                // Verificar permisos de administrador
+                response = _verificationService.VerifyAdmin(user);
+                if (response.statusCode != 200)
+                    return response;
+
+                Console.WriteLine($"Datos a guardar: Phone={model.phone}, CBU={model.cbu}, Alias={model.alias}, Name={model.name}, AccountName={model.accountName}, WppMessage={model.wppMessage}");
+
+                // Crear un nuevo contacto
+                var newContact = new Contact
+                {
+                    phone = model.phone,
+                    cbu = model.cbu,
+                    alias = model.alias,
+                    name = model.name,
+                    accountName = model.accountName,
+                    wppMessage = model.wppMessage,
+                    IsActive = false
+                };
+
+                // Guardar en la base de datos
+                _contactRepository.Save(newContact);
+
+                response.statusCode = 200;
+                response.message = "Contacto agregado con éxito";
             }
-
-            response = _verificationService.VerifyAdmin(user);
-
-            if (response.statusCode != 200)
-                return response;
-
-            if (model.Id != 0)
+            catch (Exception ex)
             {
-                response.statusCode = 400;
-                response.message = "Datos invalidos";
-                return response;
+                response.statusCode = 500;
+                response.message = $"Error al guardar el contacto: {ex.Message}";
             }
-
-            Contact newContact = new Contact(model);
-            newContact.isActive = false;
-
-            _contactRepository.Save(newContact);
-
-            response.statusCode = 200;
-            response.message = "Ok";
 
             return response;
         }
+
         public Response UpdateContact(ContactDTO model, string email)
         {
             Response response = new Response();
@@ -513,7 +549,7 @@ namespace ViandasDelSur.Services.Implementations
             }
 
             var activeContact = _contactRepository.GetActive();
-            contact.isActive = true;
+            contact.IsActive = true;
 
             _contactRepository.Save(contact);
 
@@ -522,7 +558,7 @@ namespace ViandasDelSur.Services.Implementations
             {
                 if (activeContact.Id != contact.Id)
                 {
-                    activeContact.isActive = false;
+                    activeContact.IsActive = false;
                     _contactRepository.Save(activeContact);
                 }
             }

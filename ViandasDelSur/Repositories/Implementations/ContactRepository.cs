@@ -20,7 +20,7 @@ namespace ViandasDelSur.Repositories.Implementations
         }
         public Contact GetActive()
         {
-            return FindByCondition(c => c.isActive)
+            return FindByCondition(c => c.IsActive)
                 .FirstOrDefault();
         }
         public void Save(Contact contact)

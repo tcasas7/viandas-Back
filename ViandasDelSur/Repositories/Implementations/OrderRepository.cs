@@ -6,9 +6,24 @@ namespace ViandasDelSur.Repositories.Implementations
 {
     public class OrderRepository : RepositoryBase<Order>, IOrderRepository
     {
+        private readonly VDSContext _context;
+
+        
         public OrderRepository(VDSContext repositoryContext) : base(repositoryContext)
         {
+            _context = repositoryContext;
         }
+
+        public List<Product> GetProductsByOrderId(int orderId)
+        {
+            var order = _context.Orders
+                .Include(o => o.Deliveries)
+                .ThenInclude(d => d.Product)
+                .FirstOrDefault(o => o.Id == orderId);
+
+            return order?.Deliveries.Select(d => d.Product).ToList() ?? new List<Product>();
+        }
+
         public IEnumerable<object> GetOrders()
         {
             return FindAll()
@@ -35,13 +50,14 @@ namespace ViandasDelSur.Repositories.Implementations
             if (order.Id == 0)
             {
                 Create(order);
-            } 
+            }
             else
             {
                 Update(order);
             }
             SaveChanges();
         }
+
         public void Remove(Order order)
         {
             Delete(order);

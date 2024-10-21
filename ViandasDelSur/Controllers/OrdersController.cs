@@ -51,7 +51,7 @@ namespace ViandasDelSur.Controllers
             {
                 string adminEmail = User.FindFirst("Account") != null ? User.FindFirst("Account").Value : string.Empty;
 
-                response = _ordersService.GetAll(adminEmail,email);
+                response = _ordersService.GetAll(adminEmail, email);
 
                 return new JsonResult(response);
             }
@@ -87,7 +87,7 @@ namespace ViandasDelSur.Controllers
 
         [Authorize]
         [HttpPost("place")]
-        public ActionResult<AnyType> Place( [FromBody] PlaceOrderDTO model)
+        public ActionResult<AnyType> Place([FromBody] PlaceOrderDTO model)
         {
             Response response = new Response();
             try
@@ -128,5 +128,54 @@ namespace ViandasDelSur.Controllers
                 return new JsonResult(response);
             }
         }
+
+
+        [Authorize]
+        [HttpDelete("{orderId}")]
+        public ActionResult<AnyType> DeleteOrder(int orderId)
+        {
+            Response response = new Response();
+            try
+            {
+                string email = User.FindFirst("Account") != null ? User.FindFirst("Account").Value : string.Empty;
+
+                // Llamar al servicio para eliminar la orden
+                response = _ordersService.Remove(email, orderId);
+
+                if (response.statusCode != 200)
+                    return BadRequest(response.message);
+
+                return Ok(response.message);
+            }
+            catch (Exception e)
+            {
+                response.statusCode = 500;
+                response.message = e.Message;
+                return new JsonResult(response);
+            }
+        }
+
+        [Authorize]
+        [HttpGet("products/{orderId}")]
+        public ActionResult<AnyType> GetOrderProducts(int orderId)
+        {
+            Response response = new Response();
+
+            try
+            {
+                response = _ordersService.GetOrderProducts(orderId);
+                return new JsonResult(response);
+            }
+            catch (Exception e)
+            {
+                response.statusCode = 500;
+                response.message = e.Message;
+                return new JsonResult(response);
+            }
+        }
+
+
     }
+
+
 }

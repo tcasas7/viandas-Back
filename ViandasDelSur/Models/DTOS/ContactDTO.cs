@@ -7,7 +7,7 @@
         public string cbu { get; set; }
         public string alias { get; set; }
         public string name { get; set; }
-        public bool isActive { get; set; }
+        public bool IsActive { get; set; }
         public string wppMessage { get; set; }
         public string accountName { get; set; }
 
@@ -22,7 +22,7 @@
             cbu = contact.cbu;
             alias = contact.alias;
             name = contact.name;
-            isActive = contact.isActive;
+            IsActive = contact.IsActive;
             wppMessage = contact.wppMessage;
             accountName = contact.accountName;
         }

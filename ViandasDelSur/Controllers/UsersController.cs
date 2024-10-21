@@ -172,7 +172,7 @@ namespace ViandasDelSur.Controllers
 
         [Authorize]
         [HttpPost("addLocation")]
-        public ActionResult<AnyType> AddLocation([FromBody] LocationDTO model)
+        public async Task<ActionResult<AnyType>> AddLocation([FromBody] LocationDTO model)
         {
             Response response = new Response();
             try
@@ -180,14 +180,15 @@ namespace ViandasDelSur.Controllers
                 if (String.IsNullOrEmpty(model.dir))
                 {
                     response.statusCode = 400;
-                    response.message = "Datos invalidos";
+                    response.message = "Datos inválidos";
                     return new JsonResult(response);
                 }
 
                 string email = User.FindFirst("Account") != null ? User.FindFirst("Account").Value : string.Empty;
 
-                response = _usersService.AddLocation(model, email);
-                
+                // Espera el resultado asincrónico del servicio
+                response = await _usersService.AddLocation(model, email);
+
                 return new JsonResult(response);
             }
             catch (Exception e)
@@ -256,27 +257,43 @@ namespace ViandasDelSur.Controllers
             }
         }
         [Authorize]
+        [Authorize]
         [HttpPost("addContact")]
-        public ActionResult<AnyType> AddContact([FromBody] ContactDTO model)
+        public ActionResult<Response> AddContact([FromBody] ContactDTO model)
         {
-            Response response = new Response();
+            var response = new Response();
 
             try
             {
-                string email = User.FindFirst("Account") != null ? User.FindFirst("Account").Value : string.Empty;
+                string email = User.FindFirst("Account")?.Value ?? string.Empty;
 
+                // Verificar si el email se obtiene correctamente
+                if (string.IsNullOrEmpty(email))
+                {
+                    response.statusCode = 401;
+                    response.message = "No se pudo obtener el email del usuario.";
+                    return new JsonResult(response);
+                }
+
+                // Intentar agregar el contacto
                 response = _usersService.AddContact(model, email);
+
+                if (response.statusCode != 200)
+                {
+                    return new JsonResult(response);
+                }
 
                 return new JsonResult(response);
             }
             catch (Exception e)
             {
+                // Incluir más información sobre el error
                 response.statusCode = 500;
-                response.message = e.Message;
+                response.message = $"Error al agregar el contacto: {e.Message}";
                 return new JsonResult(response);
             }
-
         }
+
 
         [Authorize]
         [HttpGet("getContacts")]
