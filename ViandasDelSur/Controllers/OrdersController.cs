@@ -132,14 +132,12 @@ namespace ViandasDelSur.Controllers
 
         [Authorize]
         [HttpDelete("{orderId}")]
-        public ActionResult<AnyType> DeleteOrder(int orderId)
+        public ActionResult<Response> DeleteOrder(int orderId)
         {
             Response response = new Response();
             try
             {
                 string email = User.FindFirst("Account") != null ? User.FindFirst("Account").Value : string.Empty;
-
-                // Llamar al servicio para eliminar la orden
                 response = _ordersService.Remove(email, orderId);
 
                 if (response.statusCode != 200)
