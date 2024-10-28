@@ -142,10 +142,11 @@ namespace ViandasDelSur.Services.Implementations
             if (user.Orders == null)
             {
                 response.statusCode = 404;
-                response.message = "Ocurrio un error";
+                response.message = "Ocurrió un error";
                 return response;
             }
 
+            // Obtener las entregas para cada orden del usuario
             foreach (var order in user.Orders)
             {
                 List<Delivery> del = _deliveryRepository.GetByOrder(order.Id).ToList();
@@ -154,9 +155,20 @@ namespace ViandasDelSur.Services.Implementations
 
             List<OrderDTO> result = new List<OrderDTO>();
 
+            // Convertir cada orden a OrderDTO, incluyendo el campo menuId en DeliveryDTO
             foreach (var order in user.Orders)
             {
                 OrderDTO orderDTO = new OrderDTO(order);
+                orderDTO.deliveries = order.Deliveries.Select(d => new DeliveryDTO
+                {
+                    Id = d.Id,
+                    productId = d.productId,
+                    delivered = d.delivered,
+                    deliveryDate = d.deliveryDate.DayOfWeek,
+                    quantity = d.quantity,
+                    MenuId = d.MenuId // Asegurar que se incluya el menuId aquí
+                }).ToList();
+
                 result.Add(orderDTO);
             }
 
@@ -164,6 +176,7 @@ namespace ViandasDelSur.Services.Implementations
 
             return response;
         }
+
 
 
         public Response Place(string email, ICollection<OrderDTO> model)
@@ -216,8 +229,9 @@ namespace ViandasDelSur.Services.Implementations
                                     orderId = order.Id,
                                     productId = deliveryDTO.productId,
                                     delivered = false,
-                                    deliveryDate = DatesTool.GetNextWeekDay(deliveryDTO.deliveryDate),  // No necesitamos cambiar el tipo de dato aquí
-                                    quantity = deliveryDTO.quantity
+                                    deliveryDate = DatesTool.GetNextWeekDay(deliveryDTO.deliveryDate),
+                                    quantity = deliveryDTO.quantity,
+                                    MenuId = product.menuId // Agregar la propiedad menuId aquí
                                 };
 
                                 order.Deliveries.Add(delivery);
@@ -227,7 +241,7 @@ namespace ViandasDelSur.Services.Implementations
                                     price = product.Menu.price,
                                     quantity = delivery.quantity,
                                     paymentMethod = modelOrder.paymentMethod,
-                                    day = deliveryDTO.deliveryDate,  // Usamos directamente el número del día (1-5)
+                                    day = deliveryDTO.deliveryDate,
                                     productName = product.name,
                                     category = product.Menu.category,
                                     validDate = product.Menu.validDate

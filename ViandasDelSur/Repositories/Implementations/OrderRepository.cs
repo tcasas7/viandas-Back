@@ -21,8 +21,13 @@ namespace ViandasDelSur.Repositories.Implementations
                 .ThenInclude(d => d.Product)
                 .FirstOrDefault(o => o.Id == orderId);
 
-            return order?.Deliveries.Select(d => d.Product).ToList() ?? new List<Product>();
+            return order?.Deliveries.Select(d =>
+            {
+                d.MenuId = d.MenuId; // Asegúrate de cargar la propiedad
+                return d.Product;
+            }).ToList() ?? new List<Product>();
         }
+
 
         public IEnumerable<object> GetOrders()
         {
@@ -38,15 +43,21 @@ namespace ViandasDelSur.Repositories.Implementations
                 .FirstOrDefault();
         }
 
+
         public IEnumerable<Order> GetOrders(int userId)
         {
             return FindByCondition(o => o.userId == userId)
                 .Include(o => o.Deliveries)
                 .ToList();
         }
-
         public void Save(Order order)
         {
+            foreach (var delivery in order.Deliveries)
+            {
+                // Asegúrate de asignar la propiedad 'menuId' si está disponible
+                delivery.MenuId = delivery.MenuId;
+            }
+
             if (order.Id == 0)
             {
                 Create(order);
@@ -55,6 +66,7 @@ namespace ViandasDelSur.Repositories.Implementations
             {
                 Update(order);
             }
+
             SaveChanges();
         }
 

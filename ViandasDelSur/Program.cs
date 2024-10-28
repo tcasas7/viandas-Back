@@ -56,7 +56,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("NewPolicy", app =>
     {
-        app.WithOrigins("http://localhost:4200", "https://maps.googleapis.com") // Ajusta según el puerto del frontend
+        app.WithOrigins("http://localhost:4200", "http://localhost:8100", "https://maps.googleapis.com") // Ajusta según el puerto del frontend
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials(); ;

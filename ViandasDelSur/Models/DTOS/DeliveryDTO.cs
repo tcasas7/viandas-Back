@@ -7,6 +7,7 @@
         public bool delivered { get; set; }
         public DayOfWeek deliveryDate { get; set; }  // Usamos directamente DayOfWeek
         public int quantity { get; set; }
+        public int MenuId { get; set; }
 
         public DeliveryDTO() { }
 

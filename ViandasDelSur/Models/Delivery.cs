@@ -12,6 +12,7 @@
 
         public int productId { get; set; }
         public Product Product { get; set; }
+        public int MenuId { get; set; }
 
         // Propiedad de solo lectura para obtener el día de la semana
         public DayOfWeek DayOfWeek => deliveryDate.DayOfWeek;
