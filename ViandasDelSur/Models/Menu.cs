@@ -10,6 +10,7 @@ namespace ViandasDelSur.Models
         public DateTime validDate { get; set; }
         public decimal price { get; set; }
         public bool IsDeleted { get; set; } = false;
+        
 
         public ICollection<Product> Products { get; set; }
 
@@ -21,6 +22,7 @@ namespace ViandasDelSur.Models
             category = menuDTO.category;
             validDate = menuDTO.validDate;
             price = menuDTO.price;
+           
             Products = new List<Product>();
 
             foreach (var productDTO in menuDTO.products)

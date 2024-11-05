@@ -6,10 +6,8 @@
         public bool delivered { get; set; }
         public DateTime deliveryDate { get; set; }  // Mantiene la fecha completa
         public int quantity { get; set; }
-
         public int orderId { get; set; }
         public Order Order { get; set; }
-
         public int productId { get; set; }
         public Product Product { get; set; }
         public int MenuId { get; set; }

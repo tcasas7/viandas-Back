@@ -51,7 +51,7 @@ namespace ViandasDelSur.Migrations
 
                     b.HasIndex("menuId");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("ViandasDelSur.Models.Contact", b =>
@@ -85,7 +85,7 @@ namespace ViandasDelSur.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Contacts");
+                    b.ToTable("Contacts", (string)null);
                 });
 
             modelBuilder.Entity("ViandasDelSur.Models.Delivery", b =>
@@ -120,7 +120,7 @@ namespace ViandasDelSur.Migrations
 
                     b.HasIndex("productId");
 
-                    b.ToTable("Delivery");
+                    b.ToTable("Delivery", (string)null);
                 });
 
             modelBuilder.Entity("ViandasDelSur.Models.Image", b =>
@@ -139,7 +139,7 @@ namespace ViandasDelSur.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Images");
+                    b.ToTable("Images", (string)null);
                 });
 
             modelBuilder.Entity("ViandasDelSur.Models.Location", b =>
@@ -169,7 +169,7 @@ namespace ViandasDelSur.Migrations
 
                     b.HasIndex("userId");
 
-                    b.ToTable("Locations");
+                    b.ToTable("Locations", (string)null);
                 });
 
             modelBuilder.Entity("ViandasDelSur.Models.Menu", b =>
@@ -194,7 +194,7 @@ namespace ViandasDelSur.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Menus");
+                    b.ToTable("Menus", (string)null);
                 });
 
             modelBuilder.Entity("ViandasDelSur.Models.Order", b =>
@@ -230,7 +230,7 @@ namespace ViandasDelSur.Migrations
 
                     b.HasIndex("userId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("ViandasDelSur.Models.SaleData", b =>
@@ -264,7 +264,7 @@ namespace ViandasDelSur.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SaleData");
+                    b.ToTable("SaleData", (string)null);
                 });
 
             modelBuilder.Entity("ViandasDelSur.Models.User", b =>
@@ -298,7 +298,7 @@ namespace ViandasDelSur.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("Product", b =>

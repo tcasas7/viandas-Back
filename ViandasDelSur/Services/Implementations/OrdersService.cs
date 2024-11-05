@@ -149,35 +149,35 @@ namespace ViandasDelSur.Services.Implementations
             // Obtener las entregas para cada orden del usuario
             foreach (var order in user.Orders)
             {
-                List<Delivery> del = _deliveryRepository.GetByOrder(order.Id).ToList();
-                order.Deliveries = del;
+                var deliveries = _deliveryRepository.GetByOrder(order.Id).ToList();
+                order.Deliveries = deliveries;
             }
 
-            List<OrderDTO> result = new List<OrderDTO>();
-
-            // Convertir cada orden a OrderDTO, incluyendo el campo menuId en DeliveryDTO
-            foreach (var order in user.Orders)
+            // Crear la lista de OrderDTO consolidando las entregas
+            var result = user.Orders.Select(order => new OrderDTO
             {
-                OrderDTO orderDTO = new OrderDTO(order);
-                orderDTO.deliveries = order.Deliveries.Select(d => new DeliveryDTO
+                Id = order.Id,
+                price = order.price,
+                paymentMethod = order.paymentMethod,
+                hasSalt = order.hasSalt,
+                orderDate = order.orderDate,
+                location = order.location,
+                description = order.description,
+                deliveries = order.Deliveries.Select(d => new DeliveryDTO
                 {
                     Id = d.Id,
                     productId = d.productId,
                     delivered = d.delivered,
                     deliveryDate = d.deliveryDate.DayOfWeek,
                     quantity = d.quantity,
-                    MenuId = d.MenuId // Asegurar que se incluya el menuId aquí
-                }).ToList();
-
-                result.Add(orderDTO);
-            }
+                    MenuId = d.MenuId
+                }).ToList()
+            }).ToList();
 
             response = new ResponseCollection<OrderDTO>(200, "Ok", result);
 
             return response;
         }
-
-
 
         public Response Place(string email, ICollection<OrderDTO> model)
         {
@@ -195,77 +195,77 @@ namespace ViandasDelSur.Services.Implementations
             if (model == null)
             {
                 response.statusCode = 400;
-                response.message = "Error";
+                response.message = "Error en el modelo proporcionado";
                 return response;
             }
 
-            foreach (var modelOrder in model)
+            // Crear un nuevo pedido para consolidar todas las entregas
+            var modelOrder = model.First(); // Usar el primer modelo como base
+            Order order = new Order
             {
-                if (modelOrder.price != 0)
+                Id = modelOrder.Id, // Puedes usar un generador de ID si es necesario
+                price = model.Sum(o => o.price), // Sumar todos los precios
+                paymentMethod = modelOrder.paymentMethod,
+                hasSalt = modelOrder.hasSalt,
+                orderDate = DateTime.UtcNow, // Registrar la fecha de la orden
+                userId = user.Id,
+                location = modelOrder.location,
+                description = modelOrder.description,
+                Deliveries = new List<Delivery>()
+            };
+
+            foreach (var modelOrderItem in model)
+            {
+                foreach (var deliveryDTO in modelOrderItem.deliveries)
                 {
-                    Order order = new Order
+                    if (deliveryDTO.quantity != 0)
                     {
-                        Id = modelOrder.Id,
-                        price = modelOrder.price,
-                        paymentMethod = modelOrder.paymentMethod,
-                        hasSalt = modelOrder.hasSalt,
-                        orderDate = modelOrder.orderDate,
-                        userId = user.Id,
-                        location = modelOrder.location,
-                        description = modelOrder.description,
-                        Deliveries = new List<Delivery>()
-                    };
+                        var product = _productRepository.GetById(deliveryDTO.productId);
 
-                    foreach (var deliveryDTO in modelOrder.deliveries)
-                    {
-                        if (deliveryDTO.quantity != 0)
+                        if (product != null)
                         {
-                            var product = _productRepository.GetById(deliveryDTO.productId);
-
-                            if (product != null)
+                            Delivery delivery = new Delivery
                             {
-                                Delivery delivery = new Delivery
-                                {
-                                    orderId = order.Id,
-                                    productId = deliveryDTO.productId,
-                                    delivered = false,
-                                    deliveryDate = DatesTool.GetNextWeekDay(deliveryDTO.deliveryDate),
-                                    quantity = deliveryDTO.quantity,
-                                    MenuId = product.menuId // Agregar la propiedad menuId aquí
-                                };
+                                productId = deliveryDTO.productId,
+                                delivered = false,
+                                deliveryDate = DatesTool.GetNextWeekDay(deliveryDTO.deliveryDate),
+                                quantity = deliveryDTO.quantity,
+                                MenuId = product.menuId
+                            };
 
-                                order.Deliveries.Add(delivery);
+                            order.Deliveries.Add(delivery);
 
-                                SaleData saleData = new SaleData
-                                {
-                                    price = product.Menu.price,
-                                    quantity = delivery.quantity,
-                                    paymentMethod = modelOrder.paymentMethod,
-                                    day = deliveryDTO.deliveryDate,
-                                    productName = product.name,
-                                    category = product.Menu.category,
-                                    validDate = product.Menu.validDate
-                                };
-
-                                _saleDataRepository.Save(saleData);
-                            }
-                            else
+                            SaleData saleData = new SaleData
                             {
-                                response.statusCode = 400;
-                                response.message = "Error al realizar la orden: Producto no encontrado";
-                                return response;
-                            }
+                                price = product.Menu.price,
+                                quantity = delivery.quantity,
+                                paymentMethod = modelOrder.paymentMethod,
+                                day = deliveryDTO.deliveryDate,
+                                productName = product.name,
+                                category = product.Menu.category,
+                                validDate = product.Menu.validDate
+                            };
+
+                            _saleDataRepository.Save(saleData);
+                        }
+                        else
+                        {
+                            response.statusCode = 400;
+                            response.message = "Error al realizar la orden: Producto no encontrado";
+                            return response;
                         }
                     }
-
-                    _orderRepository.Save(order);
                 }
             }
 
+            // Guardar el pedido consolidado
+            _orderRepository.Save(order);
+
             response.statusCode = 200;
-            response.message = "Ok";
+            response.message = "Orden realizada con éxito";
             return response;
         }
+
 
 
         public Response Remove(string email, int orderId)
