@@ -8,5 +8,7 @@ namespace ViandasDelSur.Repositories.Interfaces
         void Save(Product product);
         void Remove(Product product);
         void SaveProductWithImage(Product product, Image image);
+
+        IEnumerable<Product> GetByIds(IEnumerable<int> ids);
     }
 }

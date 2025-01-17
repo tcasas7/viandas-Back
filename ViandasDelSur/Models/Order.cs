@@ -6,6 +6,7 @@ namespace ViandasDelSur.Models
     {
         public int Id { get; set; }
         public decimal price { get; set; }
+        public decimal? precioPromo { get; set; }
         public PaymentMethod paymentMethod { get; set; }
         public bool hasSalt { get; set; }
         public string description { get; set; }

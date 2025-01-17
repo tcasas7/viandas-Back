@@ -6,6 +6,7 @@
         public string category { get; set; }
         public DateTime validDate { get; set; }
         public decimal price { get; set; }
+        public decimal? precioPromo {  get; set; }
         public List<ProductDTO> products { get; set; } = new List<ProductDTO>();
 
         public MenuDTO()
@@ -18,7 +19,8 @@
             category = menu.category;
             validDate = menu.validDate;
             price = menu.price;
-            
+            precioPromo = menu.precioPromo;
+
 
             foreach (var product in menu.Products)
             {

@@ -69,7 +69,7 @@ namespace ViandasDelSur.Services.Implementations
             if (user == null)
             {
                 response.statusCode = 401;
-                response.message = "Sesión invalida";
+                response.message = "Sesión inválida";
                 return response;
             }
 
@@ -95,8 +95,9 @@ namespace ViandasDelSur.Services.Implementations
 
                 if (existingMenu != null)
                 {
-                    // Actualizar el precio del menú
-                    existingMenu.price = menuDTO.price;  // <-- Aquí actualizamos el precio del menú
+                    // Actualizar los campos del menú existente
+                    existingMenu.price = menuDTO.price; // Actualizar precio
+                    existingMenu.precioPromo = menuDTO.precioPromo; // Actualizar precio promocional
 
                     // Actualizar los productos del menú existente
                     foreach (var productDTO in menuDTO.products)
@@ -123,26 +124,25 @@ namespace ViandasDelSur.Services.Implementations
                         }
                     }
 
-                    // Guardar los cambios en el menú
+                    // Guardar los cambios en el menú existente
                     _menuRepository.Save(existingMenu);
                 }
                 else
                 {
                     // Crear un nuevo menú si no existe
-                    Menu newMenu = new Menu(menuDTO, _imageRepository);
-                    newMenu.validDate = DatesTool.GetNextDay(DayOfWeek.Monday);
+                    Menu newMenu = new Menu(menuDTO, _imageRepository)
+                    {
+                        validDate = DatesTool.GetNextDay(DayOfWeek.Monday),
+                        precioPromo = menuDTO.precioPromo // Asignar precio promocional
+                    };
                     _menuRepository.Save(newMenu);
                 }
             }
 
-
             response.statusCode = 200;
-            response.message = "Ok";
+            response.message = "Menús actualizados correctamente";
             return response;
         }
-
-
-
 
         public Response ChangeImage(IFormFile model, int productId)
         {

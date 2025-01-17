@@ -5,7 +5,7 @@
         public int Id { get; set; }
         public int productId { get; set; }
         public bool delivered { get; set; }
-        public DayOfWeek deliveryDate { get; set; }  // Usamos directamente DayOfWeek
+        public DayOfWeek deliveryDate { get; set; } 
         public int quantity { get; set; }
         public int MenuId { get; set; }
 
@@ -16,7 +16,7 @@
             Id = delivery.Id;
             productId = delivery.productId;
             delivered = delivery.delivered;
-            deliveryDate = delivery.deliveryDate.DayOfWeek;  // No se necesita conversión a int
+            deliveryDate = delivery.deliveryDate.DayOfWeek; 
             quantity = delivery.quantity;
         }
     }

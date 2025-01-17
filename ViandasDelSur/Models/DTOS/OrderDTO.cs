@@ -6,6 +6,7 @@ namespace ViandasDelSur.Models.DTOS
     {
         public int Id { get; set; }
         public decimal price { get; set; }
+        public decimal? precioPromo { get; set; }
         public PaymentMethod paymentMethod { get; set; }
         public bool hasSalt { get; set; }
         public string description { get; set; }
@@ -23,6 +24,7 @@ namespace ViandasDelSur.Models.DTOS
         {
             Id = order.Id;
             price = order.price;
+            precioPromo = order.precioPromo;
             paymentMethod = order.paymentMethod;
             hasSalt = order.hasSalt;
             description = order.description;

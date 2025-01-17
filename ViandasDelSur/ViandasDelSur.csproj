@@ -7,6 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20250117150953_AddPrecioPromoToMenus.cs" />
+    <Compile Remove="Migrations\20250117150953_AddPrecioPromoToMenus.Designer.cs" />
     <Compile Remove="Models\DTOS\DeliverySummaryDTO.cs" />
     <Compile Remove="Models\Enums\Day.cs" />
   </ItemGroup>
