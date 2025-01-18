@@ -14,17 +14,16 @@ using ViandasDelSur.Tools;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
-builder.Services.AddControllers().AddNewtonsoftJson( options =>
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
     options.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
     options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
 });
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+// Configuración de Swagger con autenticación
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    // Añade la definición de seguridad para JWT
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
         Description = "JWT Authorization header usando Bearer. Ejemplo: \"Authorization: Bearer {token}\"",
@@ -34,7 +33,6 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "Bearer"
     });
 
-    // Añade el requerimiento de seguridad global para todos los endpoints
     c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
     {
         {
@@ -51,56 +49,59 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-
+// Configuración de CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("NewPolicy", app =>
     {
-        app.WithOrigins("http://localhost:4200", "http://localhost:8100", "https://maps.googleapis.com") // Ajusta según el puerto del frontend
+        app.WithOrigins("http://localhost:4200", "http://localhost:8100", "https://maps.googleapis.com")
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowCredentials(); ;
+            .AllowCredentials();
     });
 });
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = "JwtScheme";
-    options.DefaultChallengeScheme = "JwtScheme";
-});
 
+// Configuración de autenticación y JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer("JwtScheme", options =>
+    .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"])),
             ValidateIssuer = false,
-            ValidateAudience = false
+            ValidateAudience = false,
+            RoleClaimType = "Role",
+            NameClaimType = "Account"
         };
     });
 
+// Configuración de autorización
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("AccountOnly", policy => policy.RequireClaim("Account"));
+    options.AddPolicy("AdminPolicy", policy => policy.RequireRole("ADMIN"));
 });
 
-builder.Services.AddLogging(loggingBuilder => {
+// Configuración de logging
+builder.Services.AddLogging(loggingBuilder =>
+{
     loggingBuilder.AddConsole()
-        .AddFilter(DbLoggerCategory.Database.Command.Name, LogLevel.Information);
-    loggingBuilder.AddDebug();
+        .AddFilter("Microsoft", LogLevel.Warning)
+        .AddFilter("System", LogLevel.Warning)
+        .AddFilter("Microsoft.AspNetCore.Authentication", LogLevel.Debug);
 });
 
+// Configuración de la base de datos
 builder.Services.AddDbContext<VDSContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("VDSConnection"), builder =>
     {
-        builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);      
+        builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
     });
     options.EnableSensitiveDataLogging(true);
 });
 
-//Adds repositories
+// Repositorios
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ILocationRepository, LocationRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
@@ -111,7 +112,7 @@ builder.Services.AddScoped<IImageRepository, ImageRepository>();
 builder.Services.AddScoped<IContactRepository, ContactRepository>();
 builder.Services.AddScoped<ISaleDataRepository, SaleDataRepository>();
 
-//Adds services
+// Servicios
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IVerificationService, VerificationService>();
 builder.Services.AddScoped<IUsersService, UsersService>();
@@ -122,12 +123,9 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-
-    //Aqui obtenemos todos los services registrados en la App
     var services = scope.ServiceProvider;
     try
     {
-        // En este paso buscamos un service que este con la clase
         var context = services.GetRequiredService<VDSContext>();
         DbInitializer.Initialize(context);
     }
@@ -138,7 +136,6 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -148,10 +145,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors("NewPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
-
-app.Run();
 
 app.UseStaticFiles(new StaticFileOptions
 {
@@ -160,3 +154,4 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/media"
 });
 
+app.Run();

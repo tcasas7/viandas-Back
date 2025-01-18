@@ -21,5 +21,9 @@ namespace ViandasDelSur.Services.Interfaces
         public Response UpdateContact(ContactDTO model, string email);
         public Response RemoveContact(ContactDTO model, string email);
         public Response MakeActive(ContactDTO model, string email);
+        public Response GetPendingUsers();
+        public Response ApproveUser(int userId);
+        public void RejectUser(int userId);
+        public User FindById(int userId);
     }
 }

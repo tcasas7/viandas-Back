@@ -21,7 +21,6 @@ namespace ViandasDelSur.Controllers
             _userRepository = userRepository;
             _authService = authService;
         }
-
         [HttpPost("login")]
         public ActionResult<AnyType> Login([FromBody] LoginDTO model)
         {
@@ -29,14 +28,29 @@ namespace ViandasDelSur.Controllers
 
             try
             {
-                if (String.IsNullOrEmpty(model.email) || String.IsNullOrEmpty(model.password))
+                if (string.IsNullOrEmpty(model.email) || string.IsNullOrEmpty(model.password))
                 {
                     response.statusCode = 401;
-                    response.message = "Campos invalidos";
+                    response.message = "Campos inválidos";
                     return new JsonResult(response);
                 }
 
                 User user = _userRepository.FindByEmail(model.email);
+
+                if (user == null)
+                {
+                    response.statusCode = 401;
+                    response.message = "Usuario no encontrado";
+                    return new JsonResult(response);
+                }
+
+                // Verificar si la cuenta está aprobada
+                if (!user.IsVerified)
+                {
+                    response.statusCode = 403; // Forbidden
+                    response.message = "Cuenta pendiente de aprobación";
+                    return new JsonResult(response);
+                }
 
                 response = _authService.Login(model, user);
 

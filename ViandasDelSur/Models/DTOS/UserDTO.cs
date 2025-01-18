@@ -10,10 +10,9 @@ namespace ViandasDelSur.Models.DTOS
         public string phone { get; set; }
         public string firstName { get; set; }
         public string lastName { get; set; }
+        public bool isVerified { get; set; }
         public List<LocationDTO> locations { get; set; } = new List<LocationDTO>();
-
         public UserDTO() { }
-
         public UserDTO(User user)
         {
             Id = user.Id;
@@ -22,6 +21,7 @@ namespace ViandasDelSur.Models.DTOS
             email = user.email;
             firstName = user.firstName;
             lastName = user.lastName;
+            isVerified = user.IsVerified;
 
             foreach (var location in user.Locations)
             {

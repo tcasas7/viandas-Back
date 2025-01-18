@@ -32,6 +32,15 @@ namespace ViandasDelSur.Repositories.Implementations
                 .ToList();
         }
 
+        public IEnumerable<User> GetUnverifiedUsers()
+        {
+           
+            return FindByCondition(u => !u.IsVerified)
+                .Include(u => u.Locations)
+                .Include(u => u.Orders)
+                .ToList();
+        }
+
         public void Save(User user)
         {
             if (user.Id == 0)
@@ -44,6 +53,10 @@ namespace ViandasDelSur.Repositories.Implementations
             }
 
             SaveChanges();
+        }
+        public void Remove(User user)
+        {
+            Delete(user); 
         }
     }
 }

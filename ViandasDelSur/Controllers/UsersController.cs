@@ -15,7 +15,7 @@ namespace ViandasDelSur.Controllers
 
         public UsersController(IUsersService usersService)
         {
-            _usersService = usersService;    
+            _usersService = usersService;
         }
 
         [Authorize]
@@ -46,7 +46,7 @@ namespace ViandasDelSur.Controllers
             Response response = new Response();
             try
             {
-                if (String.IsNullOrEmpty(model.email) || 
+                if (String.IsNullOrEmpty(model.email) ||
                     String.IsNullOrEmpty(model.password) ||
                     String.IsNullOrEmpty(model.firstName) ||
                     String.IsNullOrEmpty(model.lastName))
@@ -116,7 +116,7 @@ namespace ViandasDelSur.Controllers
                 string adminEmail = User.FindFirst("Account") != null ? User.FindFirst("Account").Value : string.Empty;
 
                 response = _usersService.ChangeRole(model, adminEmail);
-                
+
                 return new JsonResult(response);
             }
             catch (Exception e)
@@ -246,7 +246,7 @@ namespace ViandasDelSur.Controllers
                 string email = User.FindFirst("Account") != null ? User.FindFirst("Account").Value : string.Empty;
 
                 response = _usersService.RemoveLocation(model, email);
-                
+
                 return new JsonResult(response);
             }
             catch (Exception e)
@@ -397,5 +397,83 @@ namespace ViandasDelSur.Controllers
                 return new JsonResult(response);
             }
         }
+
+        [Authorize(Roles = "ADMIN")]
+        [HttpGet("pendingUsers")]
+        public ActionResult<AnyType> GetPendingUsers()
+        {
+            Response response = new Response();
+
+            try
+            {
+                response = _usersService.GetPendingUsers();
+
+                return new JsonResult(response);
+            }
+            catch (Exception e)
+            {
+                response.statusCode = 500;
+                response.message = e.Message;
+                return new JsonResult(response);
+            }
+        }
+
+        [Authorize(Roles = "ADMIN")]
+        [HttpPut("approveUser/{id}")]
+        public ActionResult<AnyType> ApproveUser(int id)
+        {
+            Response response = new Response();
+
+            try
+            {
+                response = _usersService.ApproveUser(id);
+
+                return new JsonResult(response);
+            }
+            catch (Exception e)
+            {
+                response.statusCode = 500;
+                response.message = e.Message;
+                return new JsonResult(response);
+            }
+        }
+
+        [Authorize(Roles = "ADMIN")]
+        [HttpPost("rejectUser")]
+        public ActionResult<Response> RejectUser([FromBody] int userId)
+        {
+            try
+            {
+                var user = _usersService.FindById(userId);
+
+                if (user == null)
+                {
+                    return NotFound(new Response
+                    {
+                        statusCode = 404,
+                        message = "Usuario no encontrado."
+                    });
+                }
+
+                _usersService.RejectUser(userId);
+
+                return Ok(new Response
+                {
+                    statusCode = 200,
+                    message = "Usuario rechazado exitosamente."
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new Response
+                {
+                    statusCode = 500,
+                    message = "Ocurrió un error: " + ex.Message
+                });
+            }
+        }
+
+
+
     }
 }

@@ -568,5 +568,82 @@ namespace ViandasDelSur.Services.Implementations
 
             return response;
         }
+
+        public Response GetPendingUsers()
+        {
+            // Filtrar usuarios no verificados desde el repositorio
+            var pendingUsers = _userRepository.GetAllUsers()
+                .Where(u => !u.IsVerified) // Solo usuarios no verificados
+                .Select(u => new UserDTO(u)) // Mapear al DTO
+                .ToList();
+
+            if (!pendingUsers.Any())
+            {
+                return new Response
+                {
+                    statusCode = 404,
+                    message = "No hay usuarios pendientes de aprobación."
+                };
+            }
+
+            // Devolver usuarios en una respuesta estándar
+            return new ResponseCollection<UserDTO>(200, "Usuarios pendientes obtenidos", pendingUsers);
+        }
+
+        public Response ApproveUser(int userId)
+        {
+            // Buscar el usuario por ID
+            var user = _userRepository.FindById(userId);
+
+            // Si el usuario no existe
+            if (user == null)
+            {
+                return new Response
+                {
+                    statusCode = 404,
+                    message = "Usuario no encontrado."
+                };
+            }
+
+           
+            if (user.IsVerified)
+            {
+                return new Response
+                {
+                    statusCode = 400,
+                    message = "El usuario ya está aprobado."
+                };
+            }
+
+            
+            user.IsVerified = true;
+
+            
+            _userRepository.Save(user);
+
+            
+            return new Response
+            {
+                statusCode = 200,
+                message = "Usuario aprobado exitosamente."
+            };
+        }
+
+        public void RejectUser(int userId)
+        {
+            var user = _userRepository.FindById(userId);
+
+            if (user != null)
+            {
+                _userRepository.Remove(user); 
+                _userRepository.SaveChanges();
+            }
+        }
+
+        public User FindById(int userId)
+        {
+            return _userRepository.FindById(userId); 
+        }
+
     }
 }
