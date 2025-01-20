@@ -3,7 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Any;
 using Newtonsoft.Json;
 using ViandasDelSur.Models.DTOS;
+using ViandasDelSur.Models.Enums;
 using ViandasDelSur.Models.Responses;
+using ViandasDelSur.Repositories.Implementations;
+using ViandasDelSur.Repositories.Interfaces;
 using ViandasDelSur.Services.Interfaces;
 
 namespace ViandasDelSur.Controllers
@@ -13,10 +16,12 @@ namespace ViandasDelSur.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly IOrdersService _ordersService;
+        private readonly IUserRepository _userRepository;
 
-        public OrdersController(IOrdersService ordersService)
+        public OrdersController(IOrdersService ordersService, IUserRepository userRepository)
         {
             _ordersService = ordersService;
+            _userRepository = userRepository;
         }
 
 
@@ -40,6 +45,39 @@ namespace ViandasDelSur.Controllers
                 return new JsonResult(response);
             }
         }
+
+        [Authorize]
+        [HttpGet("getAll")]
+        public ActionResult<AnyType> GetAllOrders()
+        {
+            Response response = new Response();
+
+            try
+            {
+                
+                string adminEmail = User.FindFirst("Account") != null ? User.FindFirst("Account").Value : string.Empty;
+                var user = _userRepository.FindByEmail(adminEmail);
+
+               
+                if (user == null || user.role != Role.ADMIN)
+                {
+                    response.statusCode = 403; 
+                    response.message = "No tienes permisos para acceder a este recurso.";
+                    return new JsonResult(response);
+                }
+
+                
+                response = _ordersService.GetAllOrders();
+                return new JsonResult(response);
+            }
+            catch (Exception ex)
+            {
+                response.statusCode = 500; 
+                response.message = ex.Message;
+                return new JsonResult(response);
+            }
+        }
+
 
         [Authorize]
         [HttpGet("{email}")]

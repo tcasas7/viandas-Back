@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+using System.Linq;
 using ViandasDelSur.Models;
 using ViandasDelSur.Models.DTOS;
+using ViandasDelSur.Models.Enums;
 using ViandasDelSur.Models.Responses;
 using ViandasDelSur.Repositories.Implementations;
 using ViandasDelSur.Repositories.Interfaces;
@@ -83,26 +85,30 @@ namespace ViandasDelSur.Services.Implementations
         {
             Response response = new Response();
 
+            
             var adminUser = _userRepository.FindByEmail(adminEmail);
-
             if (adminUser == null)
             {
                 response.statusCode = 401;
-                response.message = "Sesión invalida";
+                response.message = "Sesión inválida";
                 return response;
             }
 
-            response = _verificationService.VerifyAdmin(adminUser);
-
-            if (response.statusCode != 200)
+           
+            if (adminUser.role == Role.ADMIN) 
             {
-                response.statusCode = 401;
-                response.message = "Sesión invalida";
+                
+                var allOrders = _orderRepository.GetOrders().Cast<Order>().ToList();
+
+              
+                var result = allOrders.Select(order => new OrderDTO(order)).ToList();
+
+                response = new ResponseCollection<OrderDTO>(200, "Órdenes obtenidas correctamente.", result);
                 return response;
             }
 
+           
             var user = _userRepository.FindByEmail(email);
-
             if (user == null)
             {
                 response.statusCode = 404;
@@ -113,22 +119,17 @@ namespace ViandasDelSur.Services.Implementations
             if (user.Orders == null)
             {
                 response.statusCode = 404;
-                response.message = "Ocurrio un error";
+                response.message = "El usuario no tiene órdenes.";
                 return response;
             }
 
-            List<OrderDTO> result = new List<OrderDTO>();
+            
+            var userOrders = user.Orders.Select(order => new OrderDTO(order)).ToList();
 
-            foreach (var order in user.Orders)
-            {
-                OrderDTO orderDTO = new OrderDTO(order);
-                result.Add(orderDTO);
-            }
-
-            response = new ResponseCollection<OrderDTO>(200, "Ok", result);
-
+            response = new ResponseCollection<OrderDTO>(200, "Órdenes obtenidas correctamente.", userOrders);
             return response;
         }
+
 
         public Response GetOwn(string email)
         {
@@ -182,6 +183,30 @@ namespace ViandasDelSur.Services.Implementations
 
             return response;
         }
+
+        public Response GetAllOrders()
+        {
+            Response response = new Response();
+
+            try
+            {
+                
+                var allOrders = _orderRepository.GetOrders(); 
+
+               
+                var result = allOrders.Select(order => new OrderDTO(order)).ToList();
+
+                response = new ResponseCollection<OrderDTO>(200, "Órdenes obtenidas correctamente.", result);
+            }
+            catch (Exception ex)
+            {
+                response.statusCode = 500;
+                response.message = $"Error al obtener órdenes: {ex.Message}";
+            }
+
+            return response;
+        }
+
 
         public Response Place(string email, ICollection<OrderDTO> model)
         {

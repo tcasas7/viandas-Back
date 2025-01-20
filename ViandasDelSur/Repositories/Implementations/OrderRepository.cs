@@ -29,7 +29,7 @@ namespace ViandasDelSur.Repositories.Implementations
         }
 
 
-        public IEnumerable<object> GetOrders()
+        public IEnumerable<Order> GetOrders()
         {
             return FindAll()
                 .Include(o => o.Deliveries)

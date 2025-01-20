@@ -111,6 +111,7 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IImageRepository, ImageRepository>();
 builder.Services.AddScoped<IContactRepository, ContactRepository>();
 builder.Services.AddScoped<ISaleDataRepository, SaleDataRepository>();
+builder.Services.AddScoped<IOrdersService, OrdersService>();
 
 // Servicios
 builder.Services.AddScoped<IAuthService, AuthService>();

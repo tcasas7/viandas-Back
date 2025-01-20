@@ -11,6 +11,7 @@ namespace ViandasDelSur.Services.Interfaces
         Response Place(string email, ICollection<OrderDTO> model);
         Response Remove(string email, int orderId);
         Response GetOrderProducts(int orderId);
+        Response GetAllOrders();
         List<Product> GetProductsByOrderId(int orderId);
     }
 }
