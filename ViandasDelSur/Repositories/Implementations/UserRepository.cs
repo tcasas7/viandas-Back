@@ -6,57 +6,106 @@ namespace ViandasDelSur.Repositories.Implementations
 {
     public class UserRepository : RepositoryBase<User>, IUserRepository
     {
-        public UserRepository(VDSContext repositoryContext) : base(repositoryContext) { }
+        protected readonly VDSContext _context;
+
+        public UserRepository(VDSContext repositoryContext) : base(repositoryContext)
+        {
+            _context = repositoryContext;
+        }
 
         public User FindByEmail(string email)
         {
-            return FindByCondition(u => u.email == email)
-                .Include(u => u.Locations)
-                .Include(u => u.Orders)
-            .FirstOrDefault();
+            try
+            {
+                return FindByCondition(u => u.email == email)
+                    .Include(u => u.Locations)
+                    .Include(u => u.Orders)
+                    .FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error al buscar usuario por email: {ex.Message}", ex);
+            }
         }
 
         public User FindById(long id)
         {
-            return FindByCondition(u => u.Id == id)
-                .Include(u => u.Locations)
-                .Include(u => u.Orders)
-                .FirstOrDefault();
+            try
+            {
+                return FindByCondition(u => u.Id == id)
+                    .Include(u => u.Locations)
+                    .Include(u => u.Orders)
+                    .FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error al buscar usuario por ID: {ex.Message}", ex);
+            }
         }
 
         public IEnumerable<User> GetAllUsers()
         {
-            return FindAll()
-                .Include(u => u.Locations)
-                .Include(u => u.Orders)
-                .ToList();
+            try
+            {
+                return FindAll()
+                    .Include(u => u.Locations)
+                    .Include(u => u.Orders)
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error al obtener todos los usuarios: {ex.Message}", ex);
+            }
         }
 
         public IEnumerable<User> GetUnverifiedUsers()
         {
-           
-            return FindByCondition(u => !u.IsVerified)
-                .Include(u => u.Locations)
-                .Include(u => u.Orders)
-                .ToList();
+            try
+            {
+                return FindByCondition(u => !u.IsVerified)
+                    .Include(u => u.Locations)
+                    .Include(u => u.Orders)
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error al obtener usuarios no verificados: {ex.Message}", ex);
+            }
         }
 
         public void Save(User user)
         {
-            if (user.Id == 0)
+            try
             {
-                Create(user);
-            }
-            else
-            {
-                Update(user);
-            }
+                if (user.Id == 0)
+                {
+                    Create(user);
+                }
+                else
+                {
+                    Update(user);
+                }
 
-            SaveChanges();
+                SaveChanges();
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new Exception($"Error al guardar el usuario: {ex.Message}", ex);
+            }
         }
+
         public void Remove(User user)
         {
-            Delete(user); 
+            try
+            {
+                Delete(user);
+                SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error al eliminar el usuario: {ex.Message}", ex);
+            }
         }
+
     }
 }

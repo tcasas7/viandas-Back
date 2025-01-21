@@ -205,53 +205,157 @@ namespace ViandasDelSur.Services.Implementations
             return response;
         }
 
-
         public async Task<Response> AddLocation(LocationDTO model, string email)
         {
-            Response response = new Response();
+            var response = new Response();
 
-            var user = _userRepository.FindByEmail(email);
-
-            if (user == null)
+            try
             {
-                response.statusCode = 401;
-                response.message = "Sesión invalida";
+                // Validar el usuario
+                var user = _userRepository.FindByEmail(email);
+                if (user == null)
+                {
+                    response.statusCode = 401;
+                    response.message = "Sesión inválida. Usuario no encontrado.";
+                    return response;
+                }
+
+                // Validar que la dirección no esté vacía
+                if (string.IsNullOrEmpty(model.dir))
+                {
+                    response.statusCode = 400;
+                    response.message = "La dirección no puede estar vacía.";
+                    return response;
+                }
+
+                // Verificar si la dirección ya existe para este usuario
+                var existingLocation = _locationRepository.FindByUserIdAndDir(user.Id, model.dir);
+                if (existingLocation != null)
+                {
+                    response.statusCode = 400;
+                    response.message = "La dirección ya está registrada para este usuario.";
+                    return response;
+                }
+
+                // Obtener las coordenadas usando la API de Google Maps
+                var coordinates = await GetCoordinatesFromGoogleMaps(model.dir);
+                if (coordinates == null || coordinates.Latitude == 0 || coordinates.Longitude == 0)
+                {
+                    response.statusCode = 400;
+                    response.message = "No se pudieron obtener coordenadas válidas para la dirección proporcionada.";
+                    return response;
+                }
+
+                // Crear la nueva ubicación
+                var newLocation = new Location
+                {
+                    Id = 0, // Puede ser generado automáticamente por la base de datos
+                    dir = model.dir,
+                    userId = user.Id,
+                    Latitude = coordinates.Latitude,
+                    Longitude = coordinates.Longitude
+                };
+
+                // Guardar la ubicación
+                _locationRepository.Save(newLocation);
+
+                response.statusCode = 200;
+                response.message = "Dirección agregada con éxito.";
+                response.data = newLocation;
+
                 return response;
             }
-
-            // Llamada a la API de Google para obtener coordenadas (latitud y longitud)
-            var coordinates = await GetCoordinatesFromGoogleMaps(model.dir);
-
-            Location newLocation = new Location
+            catch (Exception ex)
             {
-                Id = model.Id,
-                dir = model.dir,
-                userId = user.Id,
-                Latitude = coordinates.Latitude,
-                Longitude = coordinates.Longitude // Asignamos las coordenadas obtenidas
-            };
-
-            _locationRepository.Save(newLocation);
-
-            response.statusCode = 200;
-            response.message = "Ok";
-
-            return response;
+                response.statusCode = 500;
+                response.message = $"Error interno del servidor: {ex.Message}";
+                return response;
+            }
         }
-
-        // Método para llamar a la API de Google Maps y obtener latitud y longitud
-        private async Task<(double Latitude, double Longitude)> GetCoordinatesFromGoogleMaps(string address)
+        private async Task<Location?> GetCoordinatesFromGoogleMaps(string address)
         {
-            var client = new HttpClient();
-            string url = $"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key=TU_API_KEY";
-            var response = await client.GetStringAsync(url);
+            try
+            {
+                // Configurar cliente HTTP con timeout
+                using var client = new HttpClient
+                {
+                    Timeout = TimeSpan.FromSeconds(10)
+                };
 
-            // Procesar la respuesta JSON y obtener latitud y longitud
-            dynamic jsonResponse = Newtonsoft.Json.JsonConvert.DeserializeObject(response);
-            var lat = (double)jsonResponse.results[0].geometry.location.lat;
-            var lng = (double)jsonResponse.results[0].geometry.location.lng;
+                // Generar URL para la API de Google Maps
+                string apiKey = "***REMOVED***DggzKaDsmmqRH0dr_SXWg37tyJax0U0eo";
+                string url = $"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={apiKey}";
 
-            return (lat, lng);
+                // Realizar solicitud HTTP
+                var response = await client.GetStringAsync(url);
+
+                Console.WriteLine("Google Maps Response: " + response);
+
+                // Procesar la respuesta JSON
+                dynamic jsonResponse = Newtonsoft.Json.JsonConvert.DeserializeObject(response);
+
+                // Validar si se encontraron resultados
+                if (jsonResponse.results == null || jsonResponse.results.Count == 0)
+                {
+                    Console.WriteLine("No se encontraron resultados para la dirección proporcionada.");
+                    return null;
+                }
+
+                // Extraer coordenadas de latitud y longitud
+                var lat = (double?)jsonResponse.results[0].geometry.location.lat;
+                var lng = (double?)jsonResponse.results[0].geometry.location.lng;
+
+                if (lat == null || lng == null)
+                {
+                    Console.WriteLine("No se pudieron extraer coordenadas de la respuesta.");
+                    return null;
+                }
+
+                // Validar que la dirección pertenezca a Mar del Plata y General Pueyrredon
+                var addressComponents = jsonResponse.results[0].address_components;
+                bool isValidLocation = false;
+
+                foreach (var component in addressComponents)
+                {
+                    var types = component.types.ToObject<List<string>>();
+
+                    // Verificar que el componente corresponda a Mar del Plata
+                    if (types.Contains("locality") && component.long_name == "Mar del Plata")
+                    {
+                        isValidLocation = true;
+                    }
+
+                    // Verificar que el componente corresponda a General Pueyrredon
+                    if (types.Contains("administrative_area_level_2") && component.long_name == "General Pueyrredon")
+                    {
+                        isValidLocation = true;
+                    }
+                }
+
+                if (!isValidLocation)
+                {
+                    Console.WriteLine("La dirección no pertenece a Mar del Plata o General Pueyrredon.");
+                    return null;
+                }
+
+                // Retornar objeto Location con las coordenadas obtenidas
+                return new Location
+                {
+                    Latitude = lat.Value,
+                    Longitude = lng.Value,
+                    dir = address
+                };
+            }
+            catch (HttpRequestException httpEx)
+            {
+                Console.WriteLine($"Error de red al contactar la API de Google Maps: {httpEx.Message}");
+                throw new Exception("Timeout al contactar la API de Google Maps.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error en GetCoordinatesFromGoogleMaps: {ex.Message}");
+                throw;
+            }
         }
 
 
