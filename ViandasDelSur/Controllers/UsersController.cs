@@ -172,32 +172,47 @@ namespace ViandasDelSur.Controllers
 
         [Authorize]
         [HttpPost("addLocation")]
-        public async Task<ActionResult<AnyType>> AddLocation([FromBody] LocationDTO model)
+        public async Task<ActionResult<Response>> AddLocation([FromBody] LocationDTO model)
         {
-            Response response = new Response();
+            var response = new Response();
             try
             {
-                if (String.IsNullOrEmpty(model.dir))
+                // Validar datos básicos
+                if (string.IsNullOrEmpty(model.dir) || model.Latitude == 0 || model.Longitude == 0)
                 {
                     response.statusCode = 400;
-                    response.message = "Datos inválidos";
-                    return new JsonResult(response);
+                    response.message = "Datos inválidos. Por favor, complete todos los campos.";
+                    return BadRequest(response);
                 }
 
-                string email = User.FindFirst("Account") != null ? User.FindFirst("Account").Value : string.Empty;
+                string email = User.FindFirst("Account")?.Value ?? string.Empty;
 
-                // Espera el resultado asincrónico del servicio
+                if (string.IsNullOrEmpty(email))
+                {
+                    response.statusCode = 401;
+                    response.message = "Usuario no autorizado.";
+                    return Unauthorized(response);
+                }
+
+                // Llamar al servicio para agregar la ubicación
                 response = await _usersService.AddLocation(model, email);
 
                 return new JsonResult(response);
             }
+            catch (ArgumentOutOfRangeException e)
+            {
+                response.statusCode = 400;
+                response.message = "Error al agregar la ubicación: " + e.Message;
+                return BadRequest(response);
+            }
             catch (Exception e)
             {
                 response.statusCode = 500;
-                response.message = e.Message;
-                return new JsonResult(response);
+                response.message = "Error interno del servidor: " + e.Message;
+                return StatusCode(500, response);
             }
         }
+
 
         [Authorize]
         [HttpPost("makeDefault")]
@@ -227,36 +242,54 @@ namespace ViandasDelSur.Controllers
             }
         }
 
-
         [Authorize]
         [HttpPost("removeLocation")]
-        public ActionResult<AnyType> RemoveLocation([FromBody] LocationDTO model)
+        public ActionResult<Response> RemoveLocation([FromBody] LocationDTO model)
         {
-            Response response = new Response();
+            var response = new Response();
 
             try
             {
-                if (String.IsNullOrEmpty(model.dir))
+                // Validar entrada
+                if (model == null || string.IsNullOrEmpty(model.dir))
                 {
                     response.statusCode = 400;
-                    response.message = "Datos invalidos";
-                    return new JsonResult(response);
+                    response.message = "Datos inválidos. Por favor, complete todos los campos.";
+                    return BadRequest(response); // Retorna 400 Bad Request
                 }
 
-                string email = User.FindFirst("Account") != null ? User.FindFirst("Account").Value : string.Empty;
+                // Obtener email del usuario autenticado
+                string email = User.FindFirst("Account")?.Value ?? string.Empty;
 
+                if (string.IsNullOrEmpty(email))
+                {
+                    response.statusCode = 401;
+                    response.message = "No se pudo autenticar al usuario.";
+                    return Unauthorized(response); // Retorna 401 Unauthorized
+                }
+
+                // Llamar al servicio para eliminar la ubicación
                 response = _usersService.RemoveLocation(model, email);
 
-                return new JsonResult(response);
+                if (response.statusCode == 200)
+                {
+                    return Ok(response); // Retorna 200 OK si todo salió bien
+                }
+                else
+                {
+                    return BadRequest(response); // Retorna 400 si hay un problema conocido
+                }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
+                // Manejo de excepciones no controladas
                 response.statusCode = 500;
-                response.message = e.Message;
-                return new JsonResult(response);
+                response.message = $"Error interno del servidor: {ex.Message}";
+                return StatusCode(500, response); // Retorna 500 Internal Server Error
             }
         }
-        [Authorize]
+
+
         [Authorize]
         [HttpPost("addContact")]
         public ActionResult<Response> AddContact([FromBody] ContactDTO model)
