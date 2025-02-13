@@ -173,7 +173,7 @@ namespace ViandasDelSur.Services.Implementations
                     Id = d.Id,
                     productId = d.productId,
                     delivered = d.delivered,
-                    deliveryDate = d.deliveryDate.DayOfWeek,
+                    deliveryDate = d.deliveryDate,
                     quantity = d.quantity,
                     MenuId = d.MenuId
                 }).ToList()
@@ -211,29 +211,31 @@ namespace ViandasDelSur.Services.Implementations
         public Response Place(string email, ICollection<OrderDTO> model)
         {
             Response response = new Response();
+            Console.WriteLine($"📩 Iniciando el método Place para el usuario: {email}");
 
-            // Verificar el usuario
+            // 🔍 Verificar si el usuario existe
             var user = _userRepository.FindByEmail(email);
             if (user == null)
             {
+                Console.WriteLine($"❌ Error: Usuario con email {email} no encontrado.");
                 response.statusCode = 404;
                 response.message = "Usuario no encontrado";
                 return response;
             }
 
-            // Verificar que el modelo es válido
+            // 🔍 Verificar si el modelo es válido
             if (model == null || model.Count == 0)
             {
+                Console.WriteLine($"❌ Error: Modelo de orden vacío o inválido.");
                 response.statusCode = 400;
                 response.message = "Error en el modelo proporcionado";
                 return response;
             }
 
-            // Crear una nueva orden
+            // 🛒 Crear la orden
             var modelOrder = model.First();
             Order order = new Order
             {
-                Id = modelOrder.Id,
                 paymentMethod = modelOrder.paymentMethod,
                 hasSalt = modelOrder.hasSalt,
                 orderDate = DateTime.UtcNow,
@@ -243,11 +245,11 @@ namespace ViandasDelSur.Services.Implementations
                 Deliveries = new List<Delivery>()
             };
 
+            Console.WriteLine($"📝 Creando orden para usuario ID: {user.Id} con método de pago {order.paymentMethod}");
+
             decimal totalPrice = 0;
             int totalPlates = 0;
-
-            // Diccionario para agrupar platos por menú
-            var menuQuantities = new Dictionary<int, int>(); // Clave: MenuId, Valor: Cantidad de platos
+            var menuQuantities = new Dictionary<int, int>();
 
             foreach (var modelOrderItem in model)
             {
@@ -256,9 +258,9 @@ namespace ViandasDelSur.Services.Implementations
                     if (deliveryDTO.quantity <= 0) continue;
 
                     var product = _productRepository.GetById(deliveryDTO.productId);
-
                     if (product == null)
                     {
+                        Console.WriteLine($"❌ Error: Producto con ID {deliveryDTO.productId} no encontrado.");
                         response.statusCode = 400;
                         response.message = $"Error al realizar la orden: Producto con ID {deliveryDTO.productId} no encontrado";
                         return response;
@@ -267,37 +269,35 @@ namespace ViandasDelSur.Services.Implementations
                     var menu = product.Menu;
                     if (menu == null)
                     {
+                        Console.WriteLine($"❌ Error: Menú no encontrado para el producto {product.name}.");
                         response.statusCode = 400;
                         response.message = $"Error al realizar la orden: Menú no encontrado para el producto {product.name}";
                         return response;
                     }
 
-                    // Crear la entrega
+                    // 🗓️ Calcular la fecha de entrega correcta
+                    DateTime deliveryDate = DatesTool.GetNextWeekDay(deliveryDTO.deliveryDate);
+                    Console.WriteLine($"📅 Fecha de entrega calculada: {deliveryDate} para el producto {product.name}");
+
+                    // 📦 Crear la entrega
                     Delivery delivery = new Delivery
                     {
                         productId = product.Id,
                         delivered = false,
-                        deliveryDate = DatesTool.GetNextWeekDay(deliveryDTO.deliveryDate),
+                        deliveryDate = deliveryDate,
                         quantity = deliveryDTO.quantity,
-                        MenuId = product.menuId
+                        MenuId = product.MenuId
                     };
 
                     order.Deliveries.Add(delivery);
-
-                    // Registrar la cantidad total de platos
                     totalPlates += delivery.quantity;
 
-                    // Acumular platos por menú
                     if (menuQuantities.ContainsKey(menu.Id))
-                    {
                         menuQuantities[menu.Id] += delivery.quantity;
-                    }
                     else
-                    {
                         menuQuantities[menu.Id] = delivery.quantity;
-                    }
 
-                    // Registrar en SaleData
+                    // Registrar la venta
                     SaleData saleData = new SaleData
                     {
                         price = menu.price,
@@ -309,45 +309,66 @@ namespace ViandasDelSur.Services.Implementations
                         validDate = menu.validDate
                     };
 
+                    Console.WriteLine($"💾 Guardando SaleData para producto {saleData.productName} con cantidad {saleData.quantity}");
                     _saleDataRepository.Save(saleData);
                 }
             }
 
-            // Calcular el precio total
+            // 🏷️ Calcular el precio total
             foreach (var entry in menuQuantities)
             {
-                int menuId = entry.Key;
+                int MenuId = entry.Key;
                 int menuPlates = entry.Value;
 
-                var menu = _menuRepository.GetById(menuId);
+                var menu = _menuRepository.GetById(MenuId);
                 if (menu == null)
                 {
+                    Console.WriteLine($"❌ Error: Menú con ID {MenuId} no encontrado.");
                     response.statusCode = 400;
-                    response.message = $"Error al realizar la orden: Menú con ID {menuId} no encontrado";
+                    response.message = $"Error al realizar la orden: Menú con ID {MenuId} no encontrado";
                     return response;
                 }
 
-                // Aplicar precio promocional si el total de platos es 4 o más
+                // Aplicar descuento
                 if (menu.precioPromo.HasValue && totalPlates >= 4)
-                {
                     totalPrice += menu.precioPromo.Value * menuPlates;
-                }
                 else
-                {
                     totalPrice += menu.price * menuPlates;
-                }
             }
 
-            // Asignar el precio total calculado a la orden
             order.price = totalPrice;
 
-            // Guardar la orden en la base de datos
-            _orderRepository.Save(order);
+            try
+            {
+                Console.WriteLine($"💾 Guardando orden...");
+                _orderRepository.Save(order);
+                Console.WriteLine($"✅ Orden guardada correctamente con ID: {order.Id}");
+
+                // Verificar si las entregas tienen el `orderId`
+                foreach (var delivery in order.Deliveries)
+                {
+                    Console.WriteLine($"📦 Entrega -> Producto ID: {delivery.productId}, Fecha: {delivery.deliveryDate}, Orden ID: {delivery.orderId}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ ERROR al guardar la orden: {ex.Message}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"🔍 Inner Exception: {ex.InnerException.Message}");
+                }
+                return new Response
+                {
+                    statusCode = 500,
+                    message = $"Error al guardar la orden: {ex.InnerException?.Message ?? ex.Message}"
+                };
+            }
 
             response.statusCode = 200;
             response.message = "Orden realizada con éxito";
             return response;
         }
+
 
         public Response Remove(string email, int orderId)
         {

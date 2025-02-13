@@ -110,19 +110,19 @@ namespace ViandasDelSur.Tools
                 Product l5 = new Product();
                 Product p5 = new Product();
 
-                e1.menuId = mE.Id;
+                e1.MenuId = mE.Id;
                 e1.name = "Albondigas con arroz";
                 e1.day = DayOfWeek.Monday;
                 e1.Image = image;
                 context.Products.Add(e1);
 
-                l1.menuId = mL.Id;
+                l1.MenuId = mL.Id;
                 l1.name = "Omelette de zanahoria y zuccini";
                 l1.day = DayOfWeek.Monday;
                 l1.Image = image;
                 context.Products.Add(l1);
 
-                p1.menuId = mP.Id;
+                p1.MenuId = mP.Id;
                 p1.name = "Lasagna proteica";
                 p1.day = DayOfWeek.Monday;
                 p1.Image = image;
@@ -130,19 +130,19 @@ namespace ViandasDelSur.Tools
 
                 ///////////////////////////////////////////
 
-                e2.menuId = mE.Id;
+                e2.MenuId = mE.Id;
                 e2.name = "Tallarines";
                 e2.day = DayOfWeek.Tuesday;
                 e2.Image = image;
                 context.Products.Add(e2);
 
-                l2.menuId = mL.Id;
+                l2.MenuId = mL.Id;
                 l2.name = "Milanesa de calabaza";
                 l2.day = DayOfWeek.Tuesday;
                 l2.Image = image;
                 context.Products.Add(l2);
 
-                p2.menuId = mP.Id;
+                p2.MenuId = mP.Id;
                 p2.name = "Carbonada de pollo";
                 p2.day = DayOfWeek.Tuesday;
                 p2.Image = image;
@@ -150,19 +150,19 @@ namespace ViandasDelSur.Tools
 
                 //////////////////////////////////////////
 
-                e3.menuId = mE.Id;
+                e3.MenuId = mE.Id;
                 e3.name = "Carbonada de pollo";
                 e3.day = DayOfWeek.Wednesday;
                 e3.Image = image;
                 context.Products.Add(e3);
 
-                l3.menuId = mL.Id;
+                l3.MenuId = mL.Id;
                 l3.name = "Cazuela veggie";
                 l3.day = DayOfWeek.Wednesday;
                 l3.Image = image;
                 context.Products.Add(l3);
 
-                p3.menuId = mP.Id;
+                p3.MenuId = mP.Id;
                 p3.name = "Pastel de cerdo braseado";
                 p3.day = DayOfWeek.Wednesday;
                 p3.Image = image;
@@ -170,19 +170,19 @@ namespace ViandasDelSur.Tools
 
                 //////////////////////////////////////////
 
-                e4.menuId = mE.Id;
+                e4.MenuId = mE.Id;
                 e4.name = "Brochette de cerdo";
                 e4.day = DayOfWeek.Thursday;
                 e4.Image = image;
                 context.Products.Add(e4);
 
-                l4.menuId = mL.Id;
+                l4.MenuId = mL.Id;
                 l4.name = "Wok de fideos de arroz";
                 l4.day = DayOfWeek.Thursday;
                 l4.Image = image;
                 context.Products.Add(l4);
 
-                p4.menuId = mP.Id;
+                p4.MenuId = mP.Id;
                 p4.name = "Ternera con zapallitos";
                 p4.day = DayOfWeek.Thursday;
                 p4.Image = image;
@@ -190,19 +190,19 @@ namespace ViandasDelSur.Tools
 
                 //////////////////////////////////////////
 
-                e5.menuId = mE.Id;
+                e5.MenuId = mE.Id;
                 e5.name = "Ternera";
                 e5.day = DayOfWeek.Friday;
                 e5.Image = image;
                 context.Products.Add(e5);
 
-                l5.menuId = mL.Id;
+                l5.MenuId = mL.Id;
                 l5.name = "Tarta capresse";
                 l5.day = DayOfWeek.Friday;
                 l5.Image = image;
                 context.Products.Add(l5);
 
-                p5.menuId = mP.Id;
+                p5.MenuId = mP.Id;
                 p5.name = "Planchita de pollo";
                 p5.day = DayOfWeek.Friday;
                 p5.Image = image;

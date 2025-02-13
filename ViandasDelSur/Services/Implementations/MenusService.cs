@@ -119,7 +119,7 @@ namespace ViandasDelSur.Services.Implementations
                         {
                             var newImage = _imageRepository.GetById(productDTO.imageId);
                             var newProduct = new Product(productDTO, newImage);
-                            newProduct.menuId = existingMenu.Id;
+                            newProduct.MenuId = existingMenu.Id;
                             existingMenu.Products.Add(newProduct);
                         }
                     }
