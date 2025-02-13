@@ -6,6 +6,8 @@ public class ProductDTO
     public DayOfWeek day { get; set; }  // Usamos directamente DayOfWeek
     public string name { get; set; }
     public string imageFileName { get; set; }
+    public int MenuId { get; set; }
+    public Menu Menu { get; set; }
     public long imageId { get; set; }
     public decimal price { get; set; }
 
@@ -19,6 +21,7 @@ public class ProductDTO
         imageFileName = product.Image.name;
         imageId = product.imageId;
         price = product.price;
+        MenuId = product.MenuId;
     }
 }
 

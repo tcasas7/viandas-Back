@@ -12,8 +12,8 @@ using ViandasDelSur.Models;
 namespace ViandasDelSur.Migrations
 {
     [DbContext(typeof(VDSContext))]
-    [Migration("20241008143951_AddIsDeletedToMenu")]
-    partial class AddIsDeletedToMenu
+    [Migration("20250213144410_SyncWithManualChange")]
+    partial class SyncWithManualChange
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,14 +33,14 @@ namespace ViandasDelSur.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("MenuId")
+                        .HasColumnType("int");
+
                     b.Property<int>("day")
                         .HasColumnType("int");
 
                     b.Property<long>("imageId")
                         .HasColumnType("bigint");
-
-                    b.Property<int>("MenuId")
-                        .HasColumnType("int");
 
                     b.Property<string>("name")
                         .HasColumnType("nvarchar(max)");
@@ -50,9 +50,9 @@ namespace ViandasDelSur.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("imageId");
-
                     b.HasIndex("MenuId");
+
+                    b.HasIndex("imageId");
 
                     b.ToTable("Products");
                 });
@@ -65,6 +65,9 @@ namespace ViandasDelSur.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
                     b.Property<string>("accountName")
                         .HasColumnType("nvarchar(max)");
 
@@ -73,9 +76,6 @@ namespace ViandasDelSur.Migrations
 
                     b.Property<string>("cbu")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("isActive")
-                        .HasColumnType("bit");
 
                     b.Property<string>("name")
                         .HasColumnType("nvarchar(max)");
@@ -98,6 +98,9 @@ namespace ViandasDelSur.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("MenuId")
+                        .HasColumnType("int");
 
                     b.Property<bool>("delivered")
                         .HasColumnType("bit");
@@ -150,6 +153,12 @@ namespace ViandasDelSur.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<double?>("Latitude")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("Longitude")
+                        .HasColumnType("float");
+
                     b.Property<string>("dir")
                         .HasColumnType("nvarchar(max)");
 
@@ -180,8 +189,11 @@ namespace ViandasDelSur.Migrations
                     b.Property<string>("category")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal?>("precioPromo")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<decimal>("price")
-                        .HasColumnType("float");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("validDate")
                         .HasColumnType("datetime2");
@@ -214,8 +226,11 @@ namespace ViandasDelSur.Migrations
                     b.Property<int>("paymentMethod")
                         .HasColumnType("int");
 
+                    b.Property<decimal?>("precioPromo")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<decimal>("price")
-                        .HasColumnType("float");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("userId")
                         .HasColumnType("int");
@@ -238,14 +253,14 @@ namespace ViandasDelSur.Migrations
                     b.Property<string>("category")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("day")
-                        .HasColumnType("int");
+                    b.Property<DateTime>("day")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("paymentMethod")
                         .HasColumnType("int");
 
                     b.Property<decimal>("price")
-                        .HasColumnType("float");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("productName")
                         .HasColumnType("nvarchar(max)");
@@ -268,6 +283,9 @@ namespace ViandasDelSur.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsVerified")
+                        .HasColumnType("bit");
 
                     b.Property<string>("email")
                         .HasColumnType("nvarchar(max)");
@@ -297,15 +315,15 @@ namespace ViandasDelSur.Migrations
 
             modelBuilder.Entity("Product", b =>
                 {
-                    b.HasOne("ViandasDelSur.Models.Image", "Image")
-                        .WithMany("Products")
-                        .HasForeignKey("imageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("ViandasDelSur.Models.Menu", "Menu")
                         .WithMany("Products")
                         .HasForeignKey("MenuId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ViandasDelSur.Models.Image", "Image")
+                        .WithMany("Products")
+                        .HasForeignKey("imageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

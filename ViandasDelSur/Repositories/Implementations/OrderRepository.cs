@@ -33,6 +33,8 @@ namespace ViandasDelSur.Repositories.Implementations
         {
             return FindAll()
                 .Include(o => o.Deliveries)
+                .ThenInclude(d => d.Product) 
+                .ThenInclude(p => p.Menu)
                 .ToList();
         }
 
@@ -40,6 +42,7 @@ namespace ViandasDelSur.Repositories.Implementations
         {
             return FindByCondition(o => o.Id == id)
                 .Include(o => o.Deliveries)
+                .ThenInclude(d => d.Product)
                 .FirstOrDefault();
         }
 
@@ -54,8 +57,9 @@ namespace ViandasDelSur.Repositories.Implementations
         {
             foreach (var delivery in order.Deliveries)
             {
-                // Asegúrate de asignar la propiedad 'menuId' si está disponible
+                
                 delivery.MenuId = delivery.MenuId;
+                delivery.orderId = order.Id;
             }
 
             if (order.Id == 0)

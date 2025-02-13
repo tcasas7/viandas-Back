@@ -39,7 +39,7 @@ namespace ViandasDelSur.Migrations
                     b.Property<long>("imageId")
                         .HasColumnType("bigint");
 
-                    b.Property<int>("menuId")
+                    b.Property<int>("MenuId")
                         .HasColumnType("int");
 
                     b.Property<string>("name")
@@ -52,7 +52,7 @@ namespace ViandasDelSur.Migrations
 
                     b.HasIndex("imageId");
 
-                    b.HasIndex("menuId");
+                    b.HasIndex("MenuId");
 
                     b.ToTable("Products");
                 });
@@ -314,7 +314,7 @@ namespace ViandasDelSur.Migrations
 
                     b.HasOne("ViandasDelSur.Models.Menu", "Menu")
                         .WithMany("Products")
-                        .HasForeignKey("menuId")
+                        .HasForeignKey("MenuId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
