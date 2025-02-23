@@ -55,9 +55,11 @@ namespace ViandasDelSur.Services.Implementations
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("JWT:Key").Value));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
 
+            int expireMinutes = Convert.ToInt32(_configuration["JWT:ExpireMinutes"]);
+
             var securityToken = new JwtSecurityToken(
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(10),
+                expires: DateTime.Now.AddHours(12),
                 signingCredentials: creds
                 );
 
