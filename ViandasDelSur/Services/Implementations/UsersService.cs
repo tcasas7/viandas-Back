@@ -464,7 +464,6 @@ namespace ViandasDelSur.Services.Implementations
 
             return response;
         }
-
         public Response GetActiveContact(string email)
         {
             Response response = new Response();
@@ -474,21 +473,16 @@ namespace ViandasDelSur.Services.Implementations
             if (user == null)
             {
                 response.statusCode = 401;
-                response.message = "Sesión invalida";
+                response.message = "Sesión inválida";
                 return response;
             }
-
-            response = _verificationService.VerifyAdmin(user);
-
-            if (response.statusCode != 200)
-                return response;
 
             var activeContact = _contactRepository.GetActive();
 
             if (activeContact == null)
             {
                 response.statusCode = 404;
-                response.message = "Contacto activo no encontrado";
+                response.message = "No hay información de pago activa.";
                 return response;
             }
 
@@ -498,6 +492,7 @@ namespace ViandasDelSur.Services.Implementations
 
             return response;
         }
+
         public Response AddContact(ContactDTO model, string email)
         {
             var response = new Response();
