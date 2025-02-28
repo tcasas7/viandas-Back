@@ -97,8 +97,8 @@ namespace ViandasDelSur.Controllers
 
             try
             {
-                // Obtener el correo electrónico del usuario
-                string email = User.FindFirst("Account") != null ? User.FindFirst("Account").Value : string.Empty;
+                // 🔍 Verificar si el usuario está autenticado
+                string email = User.FindFirst("Account")?.Value ?? string.Empty;
 
                 if (string.IsNullOrEmpty(email))
                 {
@@ -107,7 +107,26 @@ namespace ViandasDelSur.Controllers
                     return BadRequest(response);
                 }
 
-                // Llamar al servicio para cambiar la imagen
+                // 🔍 Verificar si se subió un archivo
+                if (file == null || file.Length == 0)
+                {
+                    response.statusCode = 400;
+                    response.message = "Error: No se ha subido ningún archivo.";
+                    return BadRequest(response);
+                }
+
+                // 🔍 Validar que el archivo sea JPG
+                var allowedExtensions = new List<string> { ".jpg", ".jpeg" };
+                var extension = Path.GetExtension(file.FileName).ToLower();
+
+                if (!allowedExtensions.Contains(extension))
+                {
+                    response.statusCode = 400;
+                    response.message = "Error: Solo se permiten archivos en formato JPG.";
+                    return BadRequest(response);
+                }
+
+                // 🚀 Llamar al servicio para cambiar la imagen
                 response = _menusService.ChangeImage(file, id);
                 return StatusCode(response.statusCode, response);
             }
@@ -118,6 +137,7 @@ namespace ViandasDelSur.Controllers
                 return StatusCode(500, response);
             }
         }
+
 
     }
 }

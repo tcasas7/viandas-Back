@@ -72,7 +72,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuer = false,
             ValidateAudience = false,
             RoleClaimType = "Role",
-            NameClaimType = "Account"
+            NameClaimType = "Account",
+            ClockSkew = TimeSpan.Zero
         };
     });
 
