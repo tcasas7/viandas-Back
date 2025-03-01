@@ -168,6 +168,8 @@ namespace ViandasDelSur.Services.Implementations
                 orderDate = order.orderDate,
                 location = order.location,
                 description = order.description,
+                clientEmail = user.email, 
+                clientPhone = user.phone,
                 deliveries = order.Deliveries.Select(d => new DeliveryDTO
                 {
                     Id = d.Id,

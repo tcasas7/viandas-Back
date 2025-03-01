@@ -35,6 +35,7 @@ namespace ViandasDelSur.Repositories.Implementations
                 .Include(o => o.Deliveries)
                 .ThenInclude(d => d.Product) 
                 .ThenInclude(p => p.Menu)
+                .Include(o => o.User)
                 .ToList();
         }
 

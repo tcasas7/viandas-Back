@@ -12,7 +12,8 @@ namespace ViandasDelSur.Models.DTOS
         public string description { get; set; }
         public DateTime orderDate { get; set; }
         public string location { get; set; }
-
+        public string clientEmail { get; set; }
+        public string clientPhone { get; set; }
         public List<DeliveryDTO> deliveries { get; set; } = new List<DeliveryDTO>();
 
         public OrderDTO()
@@ -30,6 +31,8 @@ namespace ViandasDelSur.Models.DTOS
             description = order.description;
             orderDate = order.orderDate;
             location = order.location;
+            clientEmail = order.User?.email ?? "No disponible";
+            clientPhone = order.User?.phone ?? "No disponible";
 
             foreach (var delivery in order.Deliveries)
             {
