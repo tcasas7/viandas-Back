@@ -22,6 +22,8 @@ namespace ViandasDelSur.Services.Implementations
         private readonly IProductRepository _productRepository;
         private readonly ISaleDataRepository _saleDataRepository;
         private readonly IMenuRepository _menuRepository;
+        private readonly IConfiguracionRepository _configRepo;
+
 
         public OrdersService(
             VDSContext dbContext,
@@ -31,7 +33,9 @@ namespace ViandasDelSur.Services.Implementations
             IProductRepository productRepository,
             ISaleDataRepository saleDataRepository,
             IVerificationService verificationService,
-            IMenuRepository menuRepository)
+            IMenuRepository menuRepository,
+            IConfiguracionRepository configRepo)
+
         {
             _dbContext = dbContext;
             _userRepository = userRepository;
@@ -41,6 +45,7 @@ namespace ViandasDelSur.Services.Implementations
             _productRepository = productRepository;
             _saleDataRepository = saleDataRepository;
             _menuRepository = menuRepository;
+            _configRepo = configRepo;
         }
 
         public Response GetDates(string adminEmail)
@@ -316,7 +321,11 @@ namespace ViandasDelSur.Services.Implementations
                 }
             }
 
-            // 🏷️ Calcular el precio total
+            // ✅ Obtener el mínimo de platos necesarios para aplicar el descuento
+            var config = _configRepo.GetConfiguracion();
+            int minimoPlatosParaDescuento = config.MinimoPlatosDescuento;
+
+            // 🏷️ Calcular el precio total con el descuento dinámico
             foreach (var entry in menuQuantities)
             {
                 int MenuId = entry.Key;
@@ -331,8 +340,8 @@ namespace ViandasDelSur.Services.Implementations
                     return response;
                 }
 
-                // Aplicar descuento
-                if (menu.precioPromo.HasValue && totalPlates >= 4)
+                // ✅ Aplicar descuento solo si totalPlates >= minimoPlatosParaDescuento
+                if (menu.precioPromo.HasValue && totalPlates >= minimoPlatosParaDescuento)
                     totalPrice += menu.precioPromo.Value * menuPlates;
                 else
                     totalPrice += menu.price * menuPlates;

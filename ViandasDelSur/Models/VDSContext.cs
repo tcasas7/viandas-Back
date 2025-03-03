@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ViandasDelSur.Models.Responses;
 
 namespace ViandasDelSur.Models
 {
@@ -15,6 +16,8 @@ namespace ViandasDelSur.Models
         public DbSet<Image> Images { get; set; }
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<SaleData> SaleData { get; set; }
+        public DbSet<Configuracion> Configuracion { get; set; }
+
 
     }
 }
