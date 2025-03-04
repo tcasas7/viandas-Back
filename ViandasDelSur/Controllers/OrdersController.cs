@@ -130,11 +130,52 @@ namespace ViandasDelSur.Controllers
             Response response = new Response();
             try
             {
-                Console.WriteLine($"Received model: {JsonConvert.SerializeObject(model)}");
+                Console.WriteLine($"📩 Received model: {JsonConvert.SerializeObject(model)}");
 
-                string email = User.FindFirst("Account") != null ? User.FindFirst("Account").Value : string.Empty;
+                // Obtener el email del usuario autenticado
+                string email = User.FindFirst("Account")?.Value ?? string.Empty;
 
-                response = _ordersService.Place(email, model.Orders);
+                // 🚨 Validación: Verificar si hay órdenes en el DTO
+                if (model.Orders == null || !model.Orders.Any())
+                {
+                    response.statusCode = 400;
+                    response.message = "No se enviaron órdenes en la solicitud.";
+                    return new JsonResult(response);
+                }
+
+                // 📅 Obtener la fecha y hora actual
+                DateTime now = DateTime.UtcNow.Date; // 🔹 Se usa `.Date` para evitar diferencias de horas
+
+                // 🛑 Definir horario de bloqueo (Jueves 13:00 hasta Viernes 10:00)
+                DateTime blockStart = now.AddDays(DayOfWeek.Thursday - now.DayOfWeek).AddHours(13); // Jueves 13:00
+                DateTime unblockTime = now.AddDays(DayOfWeek.Friday - now.DayOfWeek).AddHours(10);  // Viernes 10:00
+
+                Console.WriteLine($"⏳ Bloqueo desde: {blockStart} hasta: {unblockTime} (Ahora: {now})");
+
+                foreach (var order in model.Orders)
+                {
+                    foreach (var delivery in order.deliveries)
+                    {
+                        DateTime deliveryDate = delivery.deliveryDate.Date;
+
+                        Console.WriteLine($"📅 Validando pedido -> Fecha entrega: {deliveryDate}");
+
+                        // 🚨 No permitir pedidos para el mismo día ni días pasados
+                        if (deliveryDate <= now)
+                        {
+                            return BadRequest(new { message = "No puedes hacer pedidos para el mismo día o días pasados." });
+                        }
+
+                        // 🚨 No permitir pedidos para la próxima semana hasta el viernes a las 10 AM
+                        if (deliveryDate >= unblockTime && now < unblockTime)
+                        {
+                            return BadRequest(new { message = "Los pedidos para la próxima semana están bloqueados hasta el viernes a las 10 AM." });
+                        }
+                    }
+                }
+
+                // ✅ Llamar al servicio solo si todo es válido
+                response = _ordersService.Place(email, model);
 
                 return new JsonResult(response);
             }
@@ -145,6 +186,8 @@ namespace ViandasDelSur.Controllers
                 return new JsonResult(response);
             }
         }
+
+
 
         [Authorize]
         [HttpPost("remove/{orderId}")]

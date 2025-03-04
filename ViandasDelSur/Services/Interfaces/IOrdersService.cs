@@ -8,7 +8,8 @@ namespace ViandasDelSur.Services.Interfaces
         Response GetDates(string adminEmail);
         Response GetAll(string adminEmail, string email);
         Response GetOwn(string email);
-        Response Place(string email, ICollection<OrderDTO> model);
+        public Response Place(string email, PlaceOrderDTO model);
+
         Response Remove(string email, int orderId);
         Response GetOrderProducts(int orderId);
         Response GetAllOrders();
