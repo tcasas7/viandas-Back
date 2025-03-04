@@ -215,7 +215,7 @@ namespace ViandasDelSur.Services.Implementations
         }
 
 
-        public Response Place(string email, ICollection<OrderDTO> model)
+        public Response Place(string email, PlaceOrderDTO model)
         {
             Response response = new Response();
             Console.WriteLine($"📩 Iniciando el método Place para el usuario: {email}");
@@ -230,23 +230,24 @@ namespace ViandasDelSur.Services.Implementations
                 return response;
             }
 
-            // 🔍 Verificar si el modelo es válido
-            if (model == null || model.Count == 0)
+            // 🚨 Validación: Verificar si hay órdenes en el DTO
+            if (model.Orders == null || !model.Orders.Any())
             {
-                Console.WriteLine($"❌ Error: Modelo de orden vacío o inválido.");
+                Console.WriteLine($"❌ Error: No se enviaron órdenes en la solicitud.");
                 response.statusCode = 400;
-                response.message = "Error en el modelo proporcionado";
+                response.message = "No se enviaron órdenes en la solicitud.";
                 return response;
             }
 
-            // 🛒 Crear la orden
-            var modelOrder = model.First();
+            // 🛒 Tomar la primera orden como referencia
+            var modelOrder = model.Orders.First();
+
             Order order = new Order
             {
                 paymentMethod = modelOrder.paymentMethod,
                 hasSalt = modelOrder.hasSalt,
                 orderDate = DateTime.UtcNow,
-                userId = user.Id,
+                userId = user.Id, // 🔹 Asignar el usuario autenticado
                 location = modelOrder.location,
                 description = modelOrder.description,
                 Deliveries = new List<Delivery>()
@@ -258,9 +259,9 @@ namespace ViandasDelSur.Services.Implementations
             int totalPlates = 0;
             var menuQuantities = new Dictionary<int, int>();
 
-            foreach (var modelOrderItem in model)
+            foreach (var orderDTO in model.Orders)
             {
-                foreach (var deliveryDTO in modelOrderItem.deliveries)
+                foreach (var deliveryDTO in orderDTO.deliveries)
                 {
                     if (deliveryDTO.quantity <= 0) continue;
 
@@ -269,7 +270,7 @@ namespace ViandasDelSur.Services.Implementations
                     {
                         Console.WriteLine($"❌ Error: Producto con ID {deliveryDTO.productId} no encontrado.");
                         response.statusCode = 400;
-                        response.message = $"Error al realizar la orden: Producto con ID {deliveryDTO.productId} no encontrado";
+                        response.message = $"Producto con ID {deliveryDTO.productId} no encontrado";
                         return response;
                     }
 
@@ -278,7 +279,7 @@ namespace ViandasDelSur.Services.Implementations
                     {
                         Console.WriteLine($"❌ Error: Menú no encontrado para el producto {product.name}.");
                         response.statusCode = 400;
-                        response.message = $"Error al realizar la orden: Menú no encontrado para el producto {product.name}";
+                        response.message = $"Menú no encontrado para el producto {product.name}";
                         return response;
                     }
 
@@ -336,7 +337,7 @@ namespace ViandasDelSur.Services.Implementations
                 {
                     Console.WriteLine($"❌ Error: Menú con ID {MenuId} no encontrado.");
                     response.statusCode = 400;
-                    response.message = $"Error al realizar la orden: Menú con ID {MenuId} no encontrado";
+                    response.message = $"Menú con ID {MenuId} no encontrado";
                     return response;
                 }
 
