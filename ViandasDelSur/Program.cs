@@ -54,10 +54,10 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("NewPolicy", app =>
     {
-        app.WithOrigins("http://localhost:4200", "http://localhost:8100", "https://maps.googleapis.com")
+        app.AllowAnyOrigin()
             .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials();
+            .AllowAnyMethod();
+            
     });
 });
 
