@@ -1,9 +1,16 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Any;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using ViandasDelSur.Models.DTOS;
 using ViandasDelSur.Models.Responses;
 using ViandasDelSur.Services.Interfaces;
+using ViandasDelSur.Services.Implementations;
+using System.Configuration;
+
 
 namespace ViandasDelSur.Controllers
 {
@@ -12,10 +19,14 @@ namespace ViandasDelSur.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUsersService _usersService;
+        private readonly IConfiguration _configuration;
+        private readonly IEmailService _emailService;
 
-        public UsersController(IUsersService usersService)
+        public UsersController(IUsersService usersService, IEmailService emailService, IConfiguration configuration)
         {
             _usersService = usersService;
+            _emailService = emailService;
+            _configuration = configuration;
         }
 
         [Authorize]
@@ -67,6 +78,55 @@ namespace ViandasDelSur.Controllers
                 return new JsonResult(response);
             }
         }
+
+        [HttpPost("forgot-password")]
+        public IActionResult ForgotPassword([FromBody] ForgotPasswordDTO model)
+        {
+            var user = _usersService.GetUserByEmail(model.email);
+            if (user == null)
+                return BadRequest(new { message = "No se encontró el email" });
+
+            var token = _usersService.GenerateResetToken(model.email);
+
+            var emailService = new EmailService();
+            emailService.SendResetPasswordEmail(model.email, token);
+
+            return Ok(new { message = "Correo enviado con instrucciones para restablecer la contraseña" });
+        }
+
+
+
+        [HttpPost("reset-password")]
+        public IActionResult ResetPassword([FromBody] ResetPasswordDTO model)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
+
+            try
+            {
+                var principal = tokenHandler.ValidateToken(model.Token, new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ClockSkew = TimeSpan.Zero
+                }, out SecurityToken validatedToken);
+
+                var email = principal.FindFirst(ClaimTypes.Email)?.Value;
+                if (string.IsNullOrEmpty(email))
+                    return BadRequest("Token inválido.");
+
+                _usersService.UpdatePasswordByEmail(email, model.NewPassword);
+
+                return Ok(new { message = "Contraseña actualizada correctamente." });
+            }
+            catch
+            {
+                return BadRequest("Token inválido o expirado.");
+            }
+        }
+
 
         [HttpPost("changePassword")]
         public ActionResult<AnyType> ChangePassword([FromBody] ChangePasswordDTO model)

@@ -1,4 +1,9 @@
-﻿using ViandasDelSur.Models;
+﻿using Microsoft.CodeAnalysis.Scripting;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using ViandasDelSur.Models;
 using ViandasDelSur.Models.DTOS;
 using ViandasDelSur.Models.Enums;
 using ViandasDelSur.Models.Responses;
@@ -6,6 +11,8 @@ using ViandasDelSur.Repositories.Implementations;
 using ViandasDelSur.Repositories.Interfaces;
 using ViandasDelSur.Services.Interfaces;
 using ViandasDelSur.Tools;
+using BCrypt.Net;
+
 
 namespace ViandasDelSur.Services.Implementations
 {
@@ -16,12 +23,18 @@ namespace ViandasDelSur.Services.Implementations
         private readonly IVerificationService _verificationService;
         private readonly IContactRepository _contactRepository;
         private readonly Encrypter _encrypter;
+        private readonly IConfiguration _configuration;
+        private readonly VDSContext _db;
+
+
 
         public UsersService(
             IUserRepository userRepository,
             ILocationRepository locationRepository,
             IVerificationService verificationService,
-            IContactRepository contactRepository
+            IContactRepository contactRepository,
+            IConfiguration configuration,
+            VDSContext db
             )
         {
             _userRepository = userRepository;
@@ -29,6 +42,8 @@ namespace ViandasDelSur.Services.Implementations
             _verificationService = verificationService;
             _contactRepository = contactRepository;
             _encrypter = new Encrypter();
+            _configuration = configuration;
+            _db = db;
         }
 
         public Response GetAll(string email)
@@ -95,6 +110,43 @@ namespace ViandasDelSur.Services.Implementations
             response.message = "Ok";
             return response;
         }
+
+        public string GenerateResetToken(string email)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Email, email) }),
+                Expires = DateTime.UtcNow.AddMinutes(15),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
+
+
+        public void UpdatePasswordByEmail(string email, string newPassword)
+        {
+            var user = _db.Users.FirstOrDefault(u => u.email == email);
+            if (user != null)
+            {
+                // Usamos Encrypter
+                byte[] newHash, newSalt;
+                _encrypter.EncryptString(newPassword, out newHash, out newSalt);
+
+                user.hash = newHash;
+                user.salt = newSalt;
+
+                _db.SaveChanges();
+            }
+        }
+
+        public User GetUserByEmail(string email)
+        {
+            return _db.Users.FirstOrDefault(u => u.email == email);
+        }
+
 
         public Response ChangePassword(ChangePasswordDTO model)
         {
@@ -283,7 +335,7 @@ namespace ViandasDelSur.Services.Implementations
                 };
 
                 // Generar URL para la API de Google Maps
-                string apiKey = "***REMOVED***DggzKaDsmmqRH0dr_SXWg37tyJax0U0eo";
+                string apiKey = "AIzaSyDggzKaDsmmqRH0dr_SXWg37tyJax0U0eo";
                 string url = $"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={apiKey}";
 
                 // Realizar solicitud HTTP
