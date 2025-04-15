@@ -25,5 +25,10 @@ namespace ViandasDelSur.Services.Interfaces
         public Response ApproveUser(int userId);
         public void RejectUser(int userId);
         public User FindById(int userId);
+        string GenerateResetToken(string email);
+        void UpdatePasswordByEmail(string email, string newPassword);
+        User GetUserByEmail(string email);
+
+
     }
 }
